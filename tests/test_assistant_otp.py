@@ -298,9 +298,11 @@ def test_assistant_validates_message_and_client_history():
 def test_logged_out_assistant_does_not_expose_cart_or_orders(monkeypatch):
     monkeypatch.delenv('GROQ_API_KEY', raising=False)
     client = app.test_client()
-    assert client.post('/api/assistant/chat', json={'message': 'Show my cart'}).status_code == 401
-    assert client.get('/api/assistant/categories').status_code == 401
     assert client.get('/api/assistant/orders/latest').status_code == 401
+    chat_res = client.post('/api/assistant/chat', json={'message': 'Show my cart'})
+    assert chat_res.status_code == 200
+    assert 'sign in' in chat_res.get_json()['reply'].lower()
+    assert client.get('/api/assistant/categories').status_code == 200
 
 
 def test_assistant_context_uses_only_authenticated_users_own_data(monkeypatch):

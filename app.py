@@ -1034,15 +1034,11 @@ def sorted_assistant_products(products: list[dict[str, Any]]) -> list[dict[str, 
 
 @app.get('/api/assistant/categories')
 def assistant_categories_api():
-    if not assistant_authenticated_user():
-        return jsonify({'error': 'Authentication required'}), 401
     return jsonify({'categories': assistant_categories()}), 200
 
 
 @app.get('/api/assistant/products')
 def assistant_products_api():
-    if not assistant_authenticated_user():
-        return jsonify({'error': 'Authentication required'}), 401
     category = request.args.get('category', '').strip()
     if category not in assistant_categories():
         return jsonify({'error': 'Choose a valid product category'}), 400
@@ -1052,8 +1048,6 @@ def assistant_products_api():
 
 @app.post('/api/assistant/budget-search')
 def assistant_budget_search():
-    if not assistant_authenticated_user():
-        return jsonify({'error': 'Authentication required'}), 401
     payload = request.get_json(silent=True)
     if not isinstance(payload, dict):
         return jsonify({'error': 'Request body must be an object'}), 400
@@ -1103,8 +1097,6 @@ def assistant_budget_search():
 
 @app.post('/api/assistant/compare')
 def assistant_compare():
-    if not assistant_authenticated_user():
-        return jsonify({'error': 'Authentication required'}), 401
     payload = request.get_json(silent=True)
     if not isinstance(payload, dict):
         return jsonify({'error': 'Request body must be an object'}), 400
@@ -1212,8 +1204,6 @@ def health_check():
 @app.post('/api/assistant/chat')
 def assistant_chat():
     user = assistant_authenticated_user()
-    if not user:
-        return jsonify({'error': 'Authentication required'}), 401
     payload = request.get_json(silent=True)
     if not isinstance(payload, dict):
         return jsonify({'error': 'Request body must be an object'}), 400
@@ -1237,15 +1227,20 @@ def assistant_chat():
     if assistant_rate_limited():
         return jsonify({'error': 'You’ve sent several messages. Please wait a few minutes and try again.'}), 429
 
-    email = user['email']
-    cart = assistant_cart_for_email(email)
-    recent_orders = [
-        {'id': order['id'], 'status': order['status'], 'createdAt': order['createdAt']}
-        for order in database.orders.find(
-            {'email': email},
-            {'id': 1, 'status': 1, 'createdAt': 1, '_id': 0},
-        ).sort('createdAt', -1).limit(5)
-    ]
+    if user:
+        email = user['email']
+        cart = assistant_cart_for_email(email)
+        recent_orders = [
+            {'id': order['id'], 'status': order['status'], 'createdAt': order['createdAt']}
+            for order in database.orders.find(
+                {'email': email},
+                {'id': 1, 'status': 1, 'createdAt': 1, '_id': 0},
+            ).sort('createdAt', -1).limit(5)
+        ]
+    else:
+        email = None
+        cart = None
+        recent_orders = None
 
     catalog_products = assistant_product_records()
     catalog_context = json.dumps(catalog_products, ensure_ascii=True, default=str)

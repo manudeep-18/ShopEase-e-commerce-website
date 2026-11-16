@@ -5,12 +5,14 @@
   fetch('/api/session')
     .then(response => response.ok ? response.json() : null)
     .then(data => {
-      if (data && data.user && data.user.email) startAssistant(data.user);
+      startAssistant(data && data.user ? data.user : null);
     })
-    .catch(() => {});
+    .catch(() => {
+      startAssistant(null);
+    });
 
   function startAssistant(user) {
-    let accountScope = user.email;
+    let accountScope = user && user.email ? user.email : 'guest';
     const historyKey = `shopease_assistant_history:${accountScope}`;
     const stateKey = `shopease_assistant_flow:${accountScope}`;
     const greetedKey = `shopease_assistant_greeted:${accountScope}`;
@@ -551,6 +553,10 @@
     }
 
     async function trackLatestOrder() {
+      if (!user || !user.email) {
+        addAssistantMessage('Please <a href="/login.html" style="color:#2563eb;font-weight:600;text-decoration:underline;">sign in</a> to view and track your orders.');
+        return;
+      }
       const data = await apiJson('/api/assistant/orders/latest');
       addAssistantMessage(data.reply);
     }
@@ -637,7 +643,7 @@
       panel.hidden = false;
       launcher.hidden = true;
       if (!wasGreeted()) {
-        const firstName = typeof user.name === 'string' ? user.name.trim().split(/\s+/)[0] : '';
+        const firstName = user && typeof user.name === 'string' ? user.name.trim().split(/\s+/)[0] : '';
         const greeting = firstName
           ? `Hi ${firstName}! 👋 I'm the ShopEase assistant. How can I help you today?`
           : "Hi there! 👋 I'm the ShopEase assistant. How can I help you today?";
