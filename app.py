@@ -33,7 +33,7 @@ app.config.update(
     SESSION_COOKIE_SAMESITE='Lax',
     SESSION_COOKIE_SECURE=os.environ.get('FLASK_SESSION_COOKIE_SECURE') == '1',
 )
-MONGODB_URI = os.environ.get('MONGODB_URI', '').strip()
+MONGODB_URI = os.environ.get('MONGODB_URI', 'mongodb://localhost:27017').strip()
 MONGODB_DATABASE = os.environ.get('MONGODB_DATABASE', 'shopease')
 if os.environ.get('MONGO_MOCK_FOR_TESTS') == '1':
     import mongomock
