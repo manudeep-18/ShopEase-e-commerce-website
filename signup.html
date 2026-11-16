@@ -44,8 +44,13 @@
           <label for="confirmPassword" class="block text-sm font-medium text-gray-200 mb-2">Confirm Password</label>
           <input type="password" id="confirmPassword" required minlength="6" autocomplete="new-password" class="w-full px-4 py-3 bg-[#1e293b] border-2 border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500" placeholder="Repeat your password" />
         </div>
+        <div id="signupOtpStep" class="hidden">
+          <label for="signupOtp" class="block text-sm font-medium text-gray-200 mb-2">Email verification code</label>
+          <input type="text" id="signupOtp" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" class="w-full px-4 py-3 bg-[#1e293b] border-2 border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500" placeholder="6-digit code" />
+          <p class="mt-2 text-xs text-gray-400">The code is valid for 10 minutes. Don't share it.</p>
+        </div>
         <p id="signupMessage" class="text-sm text-red-400" role="alert"></p>
-        <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold py-3 px-4 rounded-lg transition-all">Create Account</button>
+        <button id="signupSubmit" type="submit" class="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold py-3 px-4 rounded-lg transition-all">Send verification code</button>
       </form>
 
       <p class="text-center text-gray-300 mt-6">Already have an account? <a href="login.html" class="text-blue-400 hover:text-blue-300 font-semibold">Sign in</a></p>
@@ -55,6 +60,7 @@
   <script>
     const signupForm = document.getElementById('signupForm');
     const signupMessage = document.getElementById('signupMessage');
+    let signupOtpRequested = false;
 
     signupForm.addEventListener('submit', async (event) => {
       event.preventDefault();
@@ -73,10 +79,14 @@
       }
 
       try {
-        const response = await fetch('/api/signup', {
+        const response = await fetch(signupOtpRequested
+          ? '/api/auth/signup/verify-otp'
+          : '/api/auth/signup/request-otp', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name, email, password })
+          body: JSON.stringify(signupOtpRequested
+            ? { name, email, password, otp: document.getElementById('signupOtp').value.trim() }
+            : { email })
         });
 
         const data = await response.json();
@@ -85,11 +95,26 @@
           throw new Error(data.error || 'Signup failed');
         }
 
-        window.location.href = 'login.html';
+        if (!signupOtpRequested) {
+          signupOtpRequested = true;
+          document.getElementById('signupOtpStep').classList.remove('hidden');
+          document.getElementById('signupOtp').required = true;
+          document.getElementById('signupSubmit').textContent = 'Verify code and create account';
+          signupMessage.classList.remove('text-red-400');
+          signupMessage.classList.add('text-emerald-400');
+          signupMessage.textContent = `${data.message}. Check your inbox.`;
+          document.getElementById('signupOtp').focus();
+          return;
+        }
+        localStorage.setItem('shopease_user_email', email);
+        window.location.href = 'index.html';
       } catch (error) {
+        signupMessage.classList.add('text-red-400');
+        signupMessage.classList.remove('text-emerald-400');
         signupMessage.textContent = error.message || 'Unable to create account right now.';
       }
     });
   </script>
+  <script src="script.js"></script>
 </body>
 </html>

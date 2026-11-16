@@ -1,0 +1,368 @@
+.shopease-assistant-launcher {
+  position: fixed;
+  right: 1.25rem;
+  bottom: 1.25rem;
+  z-index: 9998;
+  border: 0;
+  border-radius: 999px;
+  padding: .9rem 1.2rem;
+  background: #2563eb;
+  color: #fff;
+  font: 700 14px/1.2 system-ui, sans-serif;
+  box-shadow: 0 8px 26px rgb(15 23 42 / 28%);
+  cursor: pointer;
+}
+
+.shopease-assistant-panel {
+  position: fixed;
+  right: 1.25rem;
+  bottom: 1.25rem;
+  z-index: 9999;
+  display: flex;
+  width: min(390px, calc(100vw - 2rem));
+  height: min(570px, calc(100dvh - 2rem));
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+  border: 1px solid #dbe3f0;
+  border-radius: 1rem;
+  background: #fff;
+  color: #172033;
+  font-family: system-ui, sans-serif;
+  box-shadow: 0 18px 60px rgb(15 23 42 / 25%);
+}
+
+.shopease-assistant-panel[hidden],
+.shopease-assistant-launcher[hidden] {
+  display: none;
+}
+
+.shopease-assistant-heading {
+  display: flex;
+  min-height: 60px;
+  align-items: center;
+  justify-content: space-between;
+  padding: .75rem 1rem;
+  background: #0b1120;
+  color: #fff;
+}
+
+.shopease-assistant-heading div {
+  display: grid;
+  gap: .15rem;
+}
+
+.shopease-assistant-heading span {
+  color: #cbd5e1;
+  font-size: .75rem;
+}
+
+.shopease-assistant-close {
+  border: 0;
+  background: transparent;
+  color: #fff;
+  font-size: 1.7rem;
+  cursor: pointer;
+}
+
+.shopease-assistant-messages {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: .65rem;
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-width: 0;
+  padding: 1rem;
+}
+
+.shopease-assistant-message {
+  max-width: 88%;
+  border-radius: .9rem;
+  padding: .7rem .85rem;
+  font-size: .9rem;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.shopease-assistant-message.is-user {
+  align-self: flex-end;
+  background: #2563eb;
+  color: #fff;
+}
+
+.shopease-assistant-message.is-assistant {
+  align-self: flex-start;
+  background: #f1f5f9;
+  color: #172033;
+}
+
+.shopease-assistant-typing {
+  align-self: flex-start;
+  color: #64748b;
+  font-size: .8rem;
+}
+
+.shopease-assistant-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .4rem;
+  overflow-x: hidden;
+  min-width: 0;
+  padding: .2rem .75rem .65rem;
+}
+
+.shopease-assistant-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .45rem;
+  align-self: flex-start;
+  max-width: 100%;
+}
+
+.shopease-assistant-option {
+  border: 1px solid #cbd5e1;
+  border-radius: 999px;
+  padding: .45rem .7rem;
+  background: #fff;
+  color: #334155;
+  font-size: .78rem;
+  cursor: pointer;
+}
+
+.shopease-assistant-option:disabled {
+  opacity: .6;
+  cursor: wait;
+}
+
+.shopease-assistant-chip {
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  white-space: normal;
+  border: 1px solid #cbd5e1;
+  border-radius: 999px;
+  padding: .4rem .6rem;
+  background: #fff;
+  color: #334155;
+  font-size: .72rem;
+  cursor: pointer;
+}
+
+.shopease-assistant-form {
+  display: flex;
+  gap: .5rem;
+  border-top: 1px solid #e2e8f0;
+  padding: .75rem;
+}
+
+.shopease-assistant-input {
+  min-width: 0;
+  flex: 1;
+  border: 1px solid #cbd5e1;
+  border-radius: .7rem;
+  padding: .65rem .75rem;
+  color: #172033;
+  font-size: .9rem;
+}
+
+.shopease-assistant-send,
+.shopease-assistant-add {
+  border: 0;
+  border-radius: .65rem;
+  padding: .6rem .8rem;
+  background: #2563eb;
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.shopease-assistant-send:disabled,
+.shopease-assistant-add:disabled {
+  opacity: .6;
+  cursor: wait;
+}
+
+.shopease-assistant-products {
+  display: grid;
+  width: 100%;
+  min-width: 0;
+  gap: .55rem;
+}
+
+.shopease-assistant-product {
+  min-width: 0;
+  display: grid;
+  gap: .35rem;
+  border: 1px solid #e2e8f0;
+  border-radius: .75rem;
+  padding: .7rem;
+  background: #fff;
+}
+
+.shopease-assistant-product-name {
+  color: #172033;
+  font-size: .87rem;
+}
+
+.shopease-assistant-product-price {
+  color: #475569;
+  font-size: .82rem;
+}
+
+.shopease-assistant-product-image {
+  width: 100%;
+  max-height: 100px;
+  border-radius: .5rem;
+  object-fit: contain;
+}
+
+.shopease-assistant-product-actions {
+  display: grid;
+  min-width: 0;
+  gap: .35rem;
+  margin-top: .2rem;
+}
+
+.shopease-assistant-product-button-row {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: .5rem;
+}
+
+.shopease-assistant-cart-feedback {
+  display: flex;
+  min-height: 1rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: .5rem;
+  color: #b91c1c;
+  font-size: .72rem;
+  overflow-wrap: anywhere;
+}
+
+.shopease-assistant-cart-feedback[hidden] {
+  display: none;
+}
+
+.shopease-assistant-cart-feedback.is-success {
+  color: #15803d;
+  font-weight: 700;
+}
+
+.shopease-assistant-product-button-row .shopease-assistant-view,
+.shopease-assistant-product-button-row .shopease-assistant-add {
+  box-sizing: border-box;
+  display: inline-flex;
+  width: 50%;
+  min-width: 0;
+  height: 42px;
+  flex: 1 1 0;
+  align-items: center;
+  justify-content: center;
+  padding: .4rem .5rem;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.shopease-assistant-cart-feedback {
+  line-height: 1.35;
+}
+
+.shopease-assistant-cart-feedback .shopease-assistant-retry {
+  flex: 0 0 auto;
+  padding: .2rem;
+}
+
+.shopease-assistant-retry {
+  border: 0;
+  background: transparent;
+  color: #1d4ed8;
+  font-size: .75rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.shopease-assistant-comparison {
+  display: grid;
+  width: 100%;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: .5rem;
+}
+
+.shopease-assistant-compare-card {
+  min-width: 0;
+  border: 1px solid #dbe3f0;
+  border-radius: .75rem;
+  padding: .65rem;
+  background: #fff;
+}
+
+.shopease-assistant-highlights {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .25rem;
+  margin-top: .35rem;
+}
+
+.shopease-assistant-highlight {
+  border-radius: 999px;
+  padding: .2rem .4rem;
+  background: #dcfce7;
+  color: #166534;
+  font-size: .65rem;
+  font-weight: 700;
+}
+
+.shopease-assistant-compare-details {
+  display: grid;
+  gap: .4rem;
+  margin: .55rem 0;
+}
+
+.shopease-assistant-compare-row {
+  border-top: 1px solid #e2e8f0;
+  padding-top: .35rem;
+}
+
+.shopease-assistant-compare-row dt {
+  color: #64748b;
+  font-size: .65rem;
+  font-weight: 700;
+}
+
+.shopease-assistant-compare-row dd {
+  margin: .1rem 0 0;
+  color: #172033;
+  font-size: .72rem;
+  overflow-wrap: anywhere;
+}
+
+.shopease-assistant-view {
+  border: 1px solid #cbd5e1;
+  border-radius: .6rem;
+  color: #1d4ed8;
+  font-size: .75rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.shopease-assistant-add {
+  font-size: .75rem;
+}
+
+.shopease-assistant-panel,
+.shopease-assistant-panel * {
+  box-sizing: border-box;
+}
+
+@media (max-width: 480px) {
+  .shopease-assistant-panel,
+  .shopease-assistant-launcher {
+    right: .6rem;
+    bottom: .6rem;
+  }
+}

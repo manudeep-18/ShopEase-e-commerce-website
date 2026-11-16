@@ -128,9 +128,18 @@
   <script>
     const params = new URLSearchParams(window.location.search);
     const storedProduct = JSON.parse(localStorage.getItem('shopease_selected_product') || 'null');
+    const queryProduct = {
+      id: params.get('id') || '',
+      name: params.get('name') || '',
+      category: params.get('category') || '',
+      price: Number(params.get('price')),
+      image: ''
+    };
     const product = storedProduct && storedProduct.name === params.get('name')
-      ? storedProduct
-      : null;
+      ? { ...storedProduct, id: storedProduct.id || params.get('id') || '' }
+      : queryProduct.name && queryProduct.category && queryProduct.price > 0
+        ? queryProduct
+        : null;
     const money = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 });
     const cartKey = 'shopease_cart';
     const wishlistKey = 'shopease_wishlist';
@@ -283,7 +292,8 @@
       productRating.innerHTML = `<span class="text-amber-500" aria-hidden="true">★★★★★</span> ${sampleRating.toFixed(1)}/5 · ${purchaseLabel} bought <span class="text-xs font-normal text-slate-500">(sample)</span>`;
       productRating.setAttribute('aria-label', `Sample rating ${sampleRating.toFixed(1)} out of 5, sample purchases ${purchaseLabel}`);
       const image = document.getElementById('productImage');
-      image.src = product.image;
+      image.hidden = !product.image;
+      if (product.image) image.src = product.image;
       image.alt = product.name;
       document.getElementById('productDescription').textContent = detailsForCategory(product.category);
       const brand = getBrand(product.name);
@@ -383,17 +393,6 @@
     function updateCartCount() {
       document.getElementById('cartCount').textContent = getCart().reduce((count, item) => count + Number(item.quantity || 0), 0);
     }
-    async function syncCartToBackend(cart) {
-      const response = await fetch('/api/cart', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ items: cart })
-      });
-      if (response.status === 401) return false;
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || 'Unable to save cart to your account');
-      return true;
-    }
     function showToast(message) {
       const toast = document.getElementById('toast');
       toast.textContent = message;
@@ -402,20 +401,14 @@
     }
     document.getElementById('addToCartButton').addEventListener('click', async () => {
       if (!product) return;
-      const cart = getCart();
-      const existing = cart.find(item => item.name === product.name);
-      if (existing) existing.quantity = Number(existing.quantity || 0) + 1;
-      else cart.push({ ...product, quantity: 1 });
-      localStorage.setItem(cartKey, JSON.stringify(cart));
-      updateCartCount();
       try {
-        const synced = await syncCartToBackend(cart);
-        showToast(synced
+        const result = await window.ShopEaseCart.addItem(product);
+        showToast(result.authenticated
           ? `${product.name} added to your cart`
           : 'Added on this device. Sign in to save your cart.');
       } catch (error) {
         console.warn('Could not sync cart to backend', error);
-        showToast('Added on this device, but could not save to your account.');
+        showToast('Could not add this item right now. Please try again.');
       }
     });
     function getWishlist() { return JSON.parse(localStorage.getItem(wishlistKey) || '[]'); }
@@ -482,5 +475,7 @@
     renderProduct();
     loadAccountProductData();
   </script>
+  <script src="/script.js?v=3"></script>
+  <script src="/assistant.js?v=3"></script>
 </body>
 </html>
