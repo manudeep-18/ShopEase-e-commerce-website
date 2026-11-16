@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign Up - ShopEase</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+    .hero-gradient { background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); }
+    #signupMessage { min-height: 1.5rem; }
+  </style>
+</head>
+<body class="bg-white text-gray-800 antialiased">
+  <nav class="sticky top-0 z-50 bg-[#0b1120] text-white px-8 py-6 w-full">
+    <div class="max-w-7xl mx-auto flex justify-between items-center">
+      <span class="text-xl font-bold tracking-widest uppercase">ShopEase</span>
+      <a href="index.html" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full font-medium transition-colors">Back to Shop</a>
+    </div>
+  </nav>
+
+  <main class="min-h-screen hero-gradient px-4 py-12 flex items-center justify-center">
+    <section class="w-full max-w-md">
+      <div class="mb-8">
+        <h1 class="text-4xl md:text-5xl font-bold text-white mb-3">Create your account</h1>
+        <p class="text-gray-300 text-lg">Join ShopEase to save your details and manage your orders.</p>
+      </div>
+
+      <form id="signupForm" class="space-y-5">
+        <div>
+          <label for="name" class="block text-sm font-medium text-gray-200 mb-2">Full Name</label>
+          <input type="text" id="name" required autocomplete="name" class="w-full px-4 py-3 bg-[#1e293b] border-2 border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500" placeholder="Your name" />
+        </div>
+        <div>
+          <label for="signupEmail" class="block text-sm font-medium text-gray-200 mb-2">Email Address</label>
+          <input type="email" id="signupEmail" required autocomplete="email" class="w-full px-4 py-3 bg-[#1e293b] border-2 border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500" placeholder="you@example.com" />
+        </div>
+        <div>
+          <label for="signupPassword" class="block text-sm font-medium text-gray-200 mb-2">Password</label>
+          <input type="password" id="signupPassword" required minlength="6" autocomplete="new-password" class="w-full px-4 py-3 bg-[#1e293b] border-2 border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500" placeholder="At least 6 characters" />
+        </div>
+        <div>
+          <label for="confirmPassword" class="block text-sm font-medium text-gray-200 mb-2">Confirm Password</label>
+          <input type="password" id="confirmPassword" required minlength="6" autocomplete="new-password" class="w-full px-4 py-3 bg-[#1e293b] border-2 border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500" placeholder="Repeat your password" />
+        </div>
+        <p id="signupMessage" class="text-sm text-red-400" role="alert"></p>
+        <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold py-3 px-4 rounded-lg transition-all">Create Account</button>
+      </form>
+
+      <p class="text-center text-gray-300 mt-6">Already have an account? <a href="login.html" class="text-blue-400 hover:text-blue-300 font-semibold">Sign in</a></p>
+    </section>
+  </main>
+
+  <script>
+    const signupForm = document.getElementById('signupForm');
+    const signupMessage = document.getElementById('signupMessage');
+
+    signupForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const name = document.getElementById('name').value.trim();
+      const email = document.getElementById('signupEmail').value.trim().toLowerCase();
+      const password = document.getElementById('signupPassword').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+
+      if (password.length < 6) {
+        signupMessage.textContent = 'Password must be at least 6 characters.';
+        return;
+      }
+      if (password !== confirmPassword) {
+        signupMessage.textContent = 'Passwords do not match.';
+        return;
+      }
+
+      try {
+        const response = await fetch('/api/signup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, password })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Signup failed');
+        }
+
+        window.location.href = 'login.html';
+      } catch (error) {
+        signupMessage.textContent = error.message || 'Unable to create account right now.';
+      }
+    });
+  </script>
+</body>
+</html>

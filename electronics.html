@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Electronics Collection - ShopEase</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script src="address-selector.js" defer></script>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    body { font-family: 'Manrope', sans-serif; background: #f7f8fc; color: #172033; }
+    h1, h2, h3, .brand { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .catalog-hero { background: linear-gradient(120deg, #0b1120, #253b75); }
+    .hero-product { animation: float-product 5s ease-in-out infinite; filter: drop-shadow(0 24px 28px rgba(0,0,0,.35)); }
+    .image-wash { background: linear-gradient(135deg, rgba(45,91,255,.18), transparent 55%), #eef1f8; }
+    .back-button { display: inline-flex; align-items: center; gap: .55rem; border: 1px solid #cbd5e1; border-radius: .75rem; padding: .7rem 1rem; color: #334155; background: rgba(255,255,255,.8); box-shadow: 0 4px 12px rgba(15,23,42,.06); transition: transform .25s ease, border-color .25s ease, color .25s ease, box-shadow .25s ease; }
+    .back-button:hover { transform: translateY(-2px); border-color: #4f46e5; color: #4338ca; box-shadow: 0 8px 18px rgba(79,70,229,.14); }
+    .product-card { animation: reveal .45s ease both; }
+    .product-card:nth-child(2) { animation-delay: .05s; } .product-card:nth-child(3) { animation-delay: .1s; } .product-card:nth-child(4) { animation-delay: .15s; }
+    .product-card:nth-child(5) { animation-delay: .2s; } .product-card:nth-child(6) { animation-delay: .25s; } .product-card:nth-child(7) { animation-delay: .3s; } .product-card:nth-child(8) { animation-delay: .35s; }
+    @keyframes reveal { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes float-product { 0%, 100% { transform: translateY(0) rotate(1deg); } 50% { transform: translateY(-8px) rotate(-1deg); } }
+  </style>
+</head>
+<body>
+  <nav class="sticky top-0 z-50 bg-[#0b1120] px-5 py-5 text-white md:px-12"><div class="mx-auto flex max-w-7xl items-center justify-between"><a class="brand text-lg font-extrabold tracking-widest" href="index.html">◒ SHOPEASE</a><div class="flex items-center gap-5"><a class="hidden bg-blue-600 px-4 py-2 text-sm font-medium text-white rounded-full hover:bg-blue-700 transition-all duration-300 hover:translate-x-1 md:block" href="index.html">Home</a><a class="relative text-2xl" href="cart.html" aria-label="Open cart">🛒<span id="cartCount" class="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold">0</span></a></div></div></nav>
+  <header class="catalog-hero px-5 py-12 text-white md:px-12 md:py-20"><div class="mx-auto flex max-w-7xl flex-col items-center gap-10 md:flex-row md:justify-between"><div><p class="mb-4 font-mono text-xs uppercase tracking-[.2em] text-cyan-300">ShopEase / Collection</p><h1 class="max-w-2xl text-4xl font-extrabold leading-tight md:text-6xl">More electronics, made for your everyday.</h1><p class="mt-5 max-w-xl text-lg text-gray-300">Explore smart devices, powerful accessories, and thoughtful tech for work and play.</p></div><div class="hidden w-72 shrink-0 rounded-3xl border border-white/15 bg-white/10 p-5 backdrop-blur-sm sm:block"><img class="hero-product h-56 w-full rounded-2xl object-cover" src="https://images.unsplash.com/photo-1468495244123-6c6c332eeece?w=700&q=85" alt="Modern electronics collection" /><p class="mt-4 text-sm font-semibold text-cyan-200">Curated tech picks</p></div></div></header>
+  <main class="mx-auto max-w-7xl px-5 py-12 md:px-12 md:py-16"><div class="mb-8 flex flex-col justify-between gap-5 sm:flex-row sm:items-end"><div><h2 class="text-2xl font-bold md:text-3xl">All electronics</h2><p class="mt-2 text-gray-500">Fresh picks across computing, audio, mobile, and home tech.</p></div><a href="index.html#products" class="back-button text-sm font-semibold" aria-label="Back to featured products"><span aria-hidden="true">←</span><span>Back to featured</span></a></div><form id="catalogSearchForm" class="mb-8 flex max-w-2xl" role="search"><div class="relative min-w-0 flex-1"><label class="sr-only" for="catalogSearch">Search products</label><input id="catalogSearch" type="search" autocomplete="off" placeholder="Search by product or category" class="w-full rounded-l-xl border border-gray-300 px-4 py-3 pr-20 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200" /><button id="catalogCamera" type="button" class="absolute right-11 top-2 rounded-lg p-2 text-gray-500 transition-colors hover:bg-blue-50 hover:text-blue-600" aria-label="Search by camera" title="Search by camera"><svg aria-hidden="true" fill="none" height="20" viewBox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg"><path d="M4 7h3l1.5-2h7L17 7h3a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/><circle cx="12" cy="13" r="4" stroke="currentColor" stroke-width="2"/></svg></button><button id="catalogMic" type="button" class="absolute right-2 top-2 rounded-lg p-2 text-gray-500 transition-colors hover:bg-blue-50 hover:text-blue-600" aria-label="Search by voice" title="Search by voice"><svg aria-hidden="true" fill="none" height="20" viewBox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg"><path d="M12 14a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v5a3 3 0 0 0 3 3Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/><path d="M19 11a7 7 0 0 1-14 0M12 18v4M8 22h8" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg></button><div id="catalogSuggestions" class="absolute left-0 right-0 top-full z-30 mt-1 hidden max-h-64 overflow-y-auto rounded-lg border border-gray-200 bg-white text-left shadow-lg"></div></div><button type="submit" class="rounded-r-xl bg-blue-600 px-5 py-3 font-semibold text-white transition hover:bg-blue-700">Search</button></form><p id="searchStatus" class="mb-5 hidden text-sm text-gray-500" aria-live="polite"></p><section id="productGrid" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4"></section></main>
+  <footer class="bg-[#0b1120] px-5 py-8 text-center text-sm text-gray-400">© 2026 ShopEase. Quality tech, delivered.</footer>
+  <div id="toast" class="fixed bottom-6 right-6 rounded-xl bg-emerald-500 px-5 py-3 font-semibold text-white opacity-0 shadow-xl transition-opacity"></div>
+  <script src="product-camera-search.js"></script>
+  <script>
+    const products = [
+      ['Apple Laptops', 'Computing', 50000, 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=600&q=80'],
+      ['Noise Cancelling Earbuds', 'Audio', 7999, 'https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=600&q=80'],
+      ['Studio Wireless Headphones', 'Audio', 12999, 'https://images.unsplash.com/photo-1484704849700-f032a568e944?w=600&q=80'],
+      ['Wireless Headphones', 'Audio', 20000, 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&q=80'],
+      ['Mechanical Keyboard', 'Accessories', 6499, 'https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=600&q=80'],
+      ['4K Monitor', 'Computing', 32999, 'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=600&q=80'],
+      ['Portable Speaker', 'Audio', 5499, 'https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=600&q=80'],
+      ['Bass Bluetooth Speaker', 'Audio', 6999, 'https://images.unsplash.com/photo-1589256469067-ea99122bbdc4?w=600&q=80'],
+      ['Pixel Pro 5G', 'Mobiles', 74999, 'https://images.unsplash.com/photo-1598327105666-5b89351aff97?w=600&q=80'],
+      ['Galaxy Ultra', 'Mobiles', 89999, 'https://images.unsplash.com/photo-1610945415295-d9bbf067e59c?w=600&q=80'],
+      ['Foldable Smart Phone', 'Mobiles', 109999, 'https://images.unsplash.com/photo-1556656793-08538906a9f8?w=600&q=80'],
+      ['Budget 5G Phone', 'Mobiles', 24999, 'https://images.unsplash.com/photo-1592899677977-9c10ca588bbd?w=600&q=80'],
+      ['Fitness Smartwatch', 'Wearables', 5999, 'https://images.unsplash.com/photo-1544117519-31a4b719223d?w=600&q=80'],
+      ['Smart Watch', 'Wearables', 5000, 'https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=600&q=80'],
+      ['Smart Fitness Band', 'Wearables', 2999, 'https://images.unsplash.com/photo-1576243345690-4e4b79b63288?w=600&q=80'],
+      ['Gaming Console', 'Gaming', 45999, 'https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?w=600&q=80'],
+      ['Wireless Mouse', 'Accessories', 2499, 'https://images.unsplash.com/photo-1527814050087-3793815479db?w=600&q=80'],
+      ['Smart Home Hub', 'Smart Home', 8999, 'https://images.unsplash.com/photo-1558089687-f282ffcbc126?w=600&q=80'],
+      ['Action Camera', 'Cameras', 26999, 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=600&q=80']
+    ];
+    // Curated, verified Unsplash photos per category so every product image
+    // actually matches its category (replaces the old random loremflickr lookup,
+    // which could return unrelated images).
+    const categoryImagePool = {
+      Accessories: [
+        'https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=600&q=80',
+        'https://images.unsplash.com/photo-1527814050087-3793815479db?w=600&q=80',
+        'https://images.unsplash.com/photo-1631552638136-6268a113b3c8?w=600&q=80'
+      ],
+      Audio: [
+        'https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=600&q=80',
+        'https://images.unsplash.com/photo-1484704849700-f032a568e944?w=600&q=80',
+        'https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=600&q=80',
+        'https://images.unsplash.com/photo-1589256469067-ea99122bbdc4?w=600&q=80',
+        'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&q=80'
+      ],
+      Cameras: [
+        'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=600&q=80'
+      ],
+      Computing: [
+        'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=600&q=80',
+        'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=600&q=80'
+      ],
+      Gaming: [
+        'https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?w=600&q=80'
+      ],
+      Mobiles: [
+        'https://images.unsplash.com/photo-1598327105666-5b89351aff97?w=600&q=80',
+        'https://images.unsplash.com/photo-1610945415295-d9bbf067e59c?w=600&q=80',
+        'https://images.unsplash.com/photo-1556656793-08538906a9f8?w=600&q=80',
+        'https://images.unsplash.com/photo-1592899677977-9c10ca588bbd?w=600&q=80',
+        'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=600&q=80'
+      ],
+      'Smart Home': [
+        'https://images.unsplash.com/photo-1558089687-f282ffcbc126?w=600&q=80'
+      ],
+      Wearables: [
+        'https://images.unsplash.com/photo-1544117519-31a4b719223d?w=600&q=80',
+        'https://images.unsplash.com/photo-1576243345690-4e4b79b63288?w=600&q=80'
+      ]
+    };
+    function imageForCategory(category, itemNumber) {
+      const pool = categoryImagePool[category] || categoryImagePool.Accessories;
+      return pool[itemNumber % pool.length];
+    }
+    const productStyles = ['Essential', 'Pro', 'Plus', 'Max', 'Ultra', 'Lite', 'Prime', 'Studio', 'Air', 'Edge', 'Core', 'Elite', 'Flex', 'Classic', 'Smart', 'Advance', 'One', 'Go', 'Power', 'Vision', 'Connect', 'Select', 'Creator', 'Performance', 'Travel', 'Home', 'Compact', 'Signature', 'Everyday', 'Premium'];
+    const categoryTargets = { Accessories: 30, Audio: 30, Cameras: 30, Computing: 30, Gaming: 30, Mobiles: 30, 'Smart Home': 30, Wearables: 30 };
+    const categoryProductNames = {
+      Audio: ['Samsung Galaxy Buds', 'OnePlus Buds', 'JBL Bluetooth Speaker', 'Sony WH Headphones', 'boAt Airdopes', 'Apple AirPods', 'Bose QuietComfort Earbuds', 'Marshall Portable Speaker', 'Nothing Ear Buds', 'Sennheiser Momentum Earbuds', 'Anker Soundcore Speaker', 'Realme Buds Air', 'Google Pixel Buds', 'Skullcandy Wireless Headphones', 'Harman Kardon Speaker', 'Oppo Enco Buds', 'Noise Air Buds', 'Zebronics Bluetooth Speaker', 'Jabra Elite Earbuds', 'Beats Studio Buds', 'Boult Audio Earbuds', 'Philips Wireless Headphones', 'Tribit Portable Speaker', 'OnePlus Nord Buds', 'Samsung Soundbar', 'Sony Extra Bass Speaker', 'Apple HomePod Mini', 'boAt Stone Speaker', 'Bose SoundLink Speaker', 'JBL Tune Headphones'],
+      Mobiles: ['iPhone 13', 'Samsung Galaxy S23', 'OnePlus 11', 'Google Pixel 8', 'iPhone 14', 'Samsung Galaxy S24', 'OnePlus 12', 'iPhone 15', 'Samsung Galaxy S24 Ultra', 'Google Pixel 8 Pro', 'OnePlus Nord 3', 'iPhone 15 Pro', 'Xiaomi 14', 'Samsung Galaxy A55', 'Motorola Edge 50', 'iPhone 16', 'OnePlus 12R', 'Google Pixel 9', 'Oppo Reno 11', 'Vivo V30', 'iPhone 16 Pro', 'Samsung Galaxy Z Flip 6', 'OnePlus Nord CE 4', 'Xiaomi Redmi Note 13', 'Motorola Razr 50', 'iPhone 16 Pro Max', 'Samsung Galaxy S25', 'Google Pixel 9 Pro', 'OnePlus Open', 'Vivo X100']
+    };
+    ['Audio', 'Mobiles'].forEach(category => {
+      products.filter(product => product[1] === category).forEach((product, itemNumber) => {
+        product[0] = categoryProductNames[category][itemNumber];
+        product[3] = imageForCategory(category, itemNumber);
+      });
+    });
+    Object.entries(categoryTargets).forEach(([category, target]) => {
+      const existingCount = products.filter(product => product[1] === category).length;
+      for (let itemNumber = existingCount; itemNumber < target; itemNumber += 1) {
+        const name = categoryProductNames[category]?.[itemNumber] || `${category} ${productStyles[itemNumber % productStyles.length]} ${String(itemNumber + 1).padStart(2, '0')}`;
+        const image = imageForCategory(category, itemNumber);
+        products.push([name, category, 1999 + itemNumber * 1500, image]);
+      }
+    });
+    const cartKey = 'shopease_cart';
+    const money = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 });
+    const grid = document.getElementById('productGrid');
+    const searchParams = new URLSearchParams(window.location.search);
+    const selectedCategory = searchParams.get('category');
+    const initialSearch = searchParams.get('search') || '';
+    const searchInput = document.getElementById('catalogSearch');
+    const searchStatus = document.getElementById('searchStatus');
+    searchInput.value = initialSearch;
+    const catalogSuggestions = document.getElementById('catalogSuggestions');
+    const productNames = [...new Set(products.map(product => product[0]))];
+    const sampleRating = 4.5;
+    const samplePurchaseFloor = 10000;
+    const searchCategoryAliases = {
+      Computing: ['laptop', 'laptops', 'computer', 'computers', 'notebook', 'notebooks'],
+      Mobiles: ['phone', 'phones', 'mobile', 'mobiles', 'smartphone', 'smartphones', 'iphone', 'iphones'],
+      Audio: ['audio', 'headphone', 'headphones', 'earbud', 'earbuds', 'speaker', 'speakers', 'headset', 'headsets'],
+      Wearables: ['wearable', 'wearables', 'watch', 'watches', 'smartwatch', 'smartwatches', 'band', 'bands'],
+      Accessories: ['accessory', 'accessories', 'keyboard', 'keyboards', 'mouse', 'mice'],
+      Gaming: ['gaming', 'game', 'games', 'console', 'consoles'],
+      Cameras: ['camera', 'cameras'],
+      'Smart Home': ['smart home', 'home hub', 'home hubs']
+    };
+    const searchProductTypeTerms = {
+      Computing: { laptop: ['laptop', 'notebook'], laptops: ['laptop', 'notebook'], notebook: ['laptop', 'notebook'], notebooks: ['laptop', 'notebook'] },
+      Audio: { headphone: ['headphone', 'headset'], headphones: ['headphone', 'headset'], headset: ['headphone', 'headset'], headsets: ['headphone', 'headset'], earbud: ['earbud', 'buds'], earbuds: ['earbud', 'buds'], speaker: ['speaker', 'soundbar'], speakers: ['speaker', 'soundbar'] },
+      Wearables: { watch: ['watch'], watches: ['watch'], smartwatch: ['watch'], smartwatches: ['watch'], band: ['band'], bands: ['band'] },
+      Accessories: { keyboard: ['keyboard'], keyboards: ['keyboard'], mouse: ['mouse'], mice: ['mouse'] },
+      Gaming: { console: ['console'], consoles: ['console'] },
+      Cameras: { camera: ['camera'], cameras: ['camera'] },
+      'Smart Home': { hub: ['hub'], hubs: ['hub'] }
+    };
+    const searchStopWords = new Set(['show', 'find', 'get', 'give', 'me', 'some', 'all', 'the', 'a', 'an', 'for', 'in', 'that', 'with', 'product', 'products', 'item', 'items', 'best', 'good', 'top', 'cheap', 'cheapest', 'affordable', 'budget', 'under', 'below', 'less', 'than', 'upto', 'up', 'to', 'max', 'maximum', 'price', 'priced', 'rupees', 'rs', '₹', 'k']);
+    document.querySelector('h2').textContent = selectedCategory ? selectedCategory + ' products' : 'All electronics';
+    function parseSearchQuery(rawQuery) {
+      let remaining = rawQuery.toLowerCase().replace(/,/g, '').trim();
+      const priceMatch = remaining.match(/\b(?:under|below|less\s+than|up\s+to|upto|max(?:imum)?)\s*₹?\s*(\d+(?:\.\d+)?)\s*(k|thousand)?\b/);
+      let maxPrice = null;
+      if (priceMatch) {
+        maxPrice = Number(priceMatch[1]) * (priceMatch[2] ? 1000 : 1);
+        remaining = remaining.replace(priceMatch[0], ' ');
+      }
+      const categories = [];
+      const productTypeGroups = [];
+      for (const [category, aliases] of Object.entries(searchCategoryAliases)) {
+        const foundAlias = aliases.find(alias => new RegExp(`\\b${alias.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\$&')}\\b`).test(remaining));
+        if (foundAlias) {
+          categories.push(category);
+          const productTypeTerms = searchProductTypeTerms[category]?.[foundAlias];
+          if (productTypeTerms) productTypeGroups.push(productTypeTerms);
+          remaining = remaining.replace(new RegExp(`\\b${foundAlias}\\b`, 'g'), ' ');
+        }
+      }
+      const terms = remaining.split(/\s+/).filter(term => term && !searchStopWords.has(term));
+      return { maxPrice, categories, productTypeGroups, terms };
+    }
+    function getVisibleProducts() {
+      const parsed = parseSearchQuery(searchInput.value);
+      return products.filter(product => {
+        const matchesCategory = !selectedCategory || product[1].toLowerCase() === selectedCategory.toLowerCase();
+        const categoryMatchesQuery = !parsed.categories.length || parsed.categories.includes(product[1]);
+        const matchesPrice = parsed.maxPrice === null || product[2] < parsed.maxPrice;
+        const productText = `${product[0]} ${product[1]}`.toLowerCase();
+        const matchesProductType = parsed.productTypeGroups.every(group => group.some(term => product[0].toLowerCase().includes(term)));
+        const matchesTerms = parsed.terms.every(term => productText.includes(term));
+        return matchesCategory && categoryMatchesQuery && matchesPrice && matchesProductType && matchesTerms;
+      });
+    }
+    function renderProducts() {
+      const visibleProducts = getVisibleProducts();
+      const parsedQuery = parseSearchQuery(searchInput.value);
+      const resultDescription = parsedQuery.categories.length || parsedQuery.maxPrice !== null
+        ? ` for ${[...parsedQuery.categories, parsedQuery.maxPrice !== null ? `under ${money.format(parsedQuery.maxPrice)}` : ''].filter(Boolean).join(' ')}${parsedQuery.terms.length ? ` matching ${parsedQuery.terms.join(' ')}` : ''}`
+        : '';
+      searchStatus.textContent = visibleProducts.length
+        ? `${visibleProducts.length} item${visibleProducts.length === 1 ? '' : 's'} found${resultDescription}`
+        : 'No matching items. Try a different product type or budget.';
+      searchStatus.classList.toggle('hidden', !searchInput.value.trim());
+      grid.innerHTML = visibleProducts.map(product => { const index = products.indexOf(product); return `<article class="product-card flex cursor-pointer flex-col overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-gray-200 transition hover:-translate-y-1 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500" data-product-index="${index}" tabindex="0" role="link" aria-label="View details for ${product[0]}"><div class="image-wash relative h-52 overflow-hidden p-2"><img class="h-full w-full rounded-xl object-cover transition duration-500 hover:scale-105" src="${product[3]}" alt="${product[0]}" loading="lazy" /><span class="absolute left-4 top-4 rounded-full bg-white/90 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-blue-700 shadow-sm">Featured</span></div><div class="flex flex-1 flex-col p-5"><p class="mb-1 text-xs font-semibold uppercase tracking-widest text-gray-400">${product[1]}</p><h3 class="text-lg font-bold">${product[0]}</h3><div class="mt-2 flex flex-wrap items-center gap-x-1.5 text-xs" aria-label="Sample rating ${sampleRating} out of 5 and sample purchases above 10,000"><span class="text-amber-500" aria-hidden="true">★★★★★</span><span class="font-semibold text-slate-700">${sampleRating}/5</span><span class="text-gray-500">· 10k+ bought (sample)</span></div><div class="mt-4 flex items-center justify-between"><span class="text-lg font-bold text-blue-600">${money.format(product[2])}</span><button class="rounded-full bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-700" data-index="${index}" type="button">Add to cart</button></div></div></article>`; }).join('');
+    }
+    function getCart() { return JSON.parse(localStorage.getItem(cartKey) || '[]'); }
+    function updateCount() { document.getElementById('cartCount').textContent = getCart().reduce((sum, item) => sum + item.quantity, 0); }
+    async function syncCartToBackend(cart) {
+      const response = await fetch('/api/cart', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ items: cart })
+      });
+      if (response.status === 401) return false;
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Unable to save cart to your account');
+      return true;
+    }
+    function showCartToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.remove('opacity-0');
+      setTimeout(() => toast.classList.add('opacity-0'), 1800);
+    }
+    async function addToCart(index) {
+      const [name, category, price, image] = products[index];
+      const cart = getCart();
+      const existing = cart.find(item => item.name === name);
+      if (existing) existing.quantity += 1;
+      else cart.push({ name, category, price, image, quantity: 1 });
+      localStorage.setItem(cartKey, JSON.stringify(cart));
+      updateCount();
+      try {
+        const synced = await syncCartToBackend(cart);
+        showCartToast(synced ? name + ' added to your cart' : 'Added on this device. Sign in to save your cart.');
+      } catch (error) {
+        console.warn('Could not sync cart to backend', error);
+        showCartToast('Added on this device, but could not save to your account.');
+      }
+    }
+    renderProducts();
+    searchInput.addEventListener('input', () => {
+      renderProducts();
+      const query = searchInput.value.trim().toLowerCase();
+      const matches = query ? productNames.filter(name => name.toLowerCase().includes(query)).slice(0, 8) : [];
+      catalogSuggestions.innerHTML = matches.map(name => `<button type="button" class="block w-full px-4 py-3 text-left text-sm text-gray-700 hover:bg-blue-50">${name}</button>`).join('');
+      catalogSuggestions.classList.toggle('hidden', matches.length === 0);
+    });
+    catalogSuggestions.addEventListener('click', event => {
+      searchInput.value = event.target.textContent;
+      catalogSuggestions.classList.add('hidden');
+      renderProducts();
+      searchInput.focus();
+    });
+    setupVoiceSearch(searchInput, document.getElementById('catalogMic'), () => {
+      renderProducts();
+      catalogSuggestions.classList.add('hidden');
+    });
+    function setupVoiceSearch(input, micButton, onResult) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        micButton.disabled = true;
+        micButton.classList.add('cursor-not-allowed', 'opacity-40');
+        micButton.title = 'Voice search is not supported in this browser';
+        return;
+      }
+      const recognition = new SpeechRecognition();
+      recognition.lang = 'en-US';
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+      recognition.addEventListener('start', () => micButton.classList.add('text-red-500', 'animate-pulse'));
+      recognition.addEventListener('end', () => micButton.classList.remove('text-red-500', 'animate-pulse'));
+      recognition.addEventListener('result', event => {
+        input.value = event.results[0][0].transcript;
+        onResult();
+      });
+      recognition.addEventListener('error', () => micButton.classList.remove('text-red-500', 'animate-pulse'));
+      micButton.addEventListener('click', () => recognition.start());
+    }
+    const cameraSearch = initializeProductCameraSearch({
+      button: 'catalogCamera',
+      products: products.map(product => ({ name: product[0], category: product[1] })),
+      onMatch: product => {
+        searchInput.value = product.name;
+        renderProducts();
+        searchStatus.textContent = `Found ${product.name} in the catalog.`;
+        searchStatus.classList.remove('hidden');
+        cameraCategoryChoices.replaceChildren();
+        cameraCategoryChoices.classList.add('hidden');
+        document.getElementById('productGrid').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      },
+      onCategoryMatch: (category, detectedLabel) => {
+        searchInput.value = category;
+        renderProducts();
+        searchStatus.textContent = `The photo looks like ${category.toLowerCase()} (${detectedLabel}). Showing matching catalog products; the exact model could not be identified.`;
+        searchStatus.classList.remove('hidden');
+        cameraCategoryChoices.replaceChildren();
+        cameraCategoryChoices.classList.add('hidden');
+        document.getElementById('productGrid').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      },
+      onNoMatch: (recognizedText, categories) => {
+        searchStatus.textContent = recognizedText.trim()
+          ? `Could not match the text "${recognizedText.trim().slice(0, 120)}" to a catalog item. Choose a category to browse similar products.`
+          : 'Could not identify a product category from this photo. Choose a category to browse similar products.';
+        searchStatus.classList.remove('hidden');
+        cameraCategoryChoices.replaceChildren(...categories.map(category => {
+          const choice = document.createElement('button');
+          choice.type = 'button';
+          choice.className = 'rounded-full border border-blue-200 bg-white px-4 py-2 text-sm font-semibold text-blue-700 hover:bg-blue-50';
+          choice.textContent = `Browse ${category}`;
+          choice.dataset.category = category;
+          return choice;
+        }));
+        cameraCategoryChoices.classList.toggle('hidden', !categories.length);
+        searchStatus.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    });
+    const cameraCategoryChoices = document.createElement('div');
+    cameraCategoryChoices.className = 'mb-5 flex flex-wrap gap-2';
+    cameraCategoryChoices.classList.add('hidden');
+    searchStatus.insertAdjacentElement('afterend', cameraCategoryChoices);
+    cameraCategoryChoices.addEventListener('click', event => {
+      const choice = event.target.closest('button[data-category]');
+      if (!choice) return;
+      searchInput.value = choice.dataset.category;
+      renderProducts();
+      searchStatus.textContent = `Showing ${choice.dataset.category} products similar to your scan.`;
+      cameraCategoryChoices.classList.add('hidden');
+      document.getElementById('productGrid').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+    if (searchParams.get('scan') === '1') cameraSearch.open();
+    document.getElementById('catalogSearchForm').addEventListener('submit', event => event.preventDefault());
+    function openProduct(index) {
+      const [name, category, price, image] = products[index];
+      localStorage.setItem('shopease_selected_product', JSON.stringify({ name, category, price, image, sampleRating, samplePurchaseFloor }));
+      window.location.href = `product.html?name=${encodeURIComponent(name)}&category=${encodeURIComponent(category)}`;
+    }
+    grid.addEventListener('click', event => {
+      const button = event.target.closest('button[data-index]');
+      if (button) {
+        event.stopPropagation();
+        addToCart(Number(button.dataset.index));
+        return;
+      }
+      const card = event.target.closest('[data-product-index]');
+      if (card) openProduct(Number(card.dataset.productIndex));
+    });
+    grid.addEventListener('keydown', event => {
+      const card = event.target.closest('[data-product-index]');
+      if (card && event.target === card && (event.key === 'Enter' || event.key === ' ')) {
+        event.preventDefault();
+        openProduct(Number(card.dataset.productIndex));
+      }
+    });
+    updateCount();
+  </script>
+</body>
+</html>

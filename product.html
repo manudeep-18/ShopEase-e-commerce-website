@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Product Details - ShopEase</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script src="address-selector.js" defer></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
+    body { font-family: 'DM Sans', sans-serif; background: #f5f7fa; }
+    h1, h2, h3 { font-family: 'Space Grotesk', sans-serif; }
+    .product-image { background: radial-gradient(circle at 50% 42%, #fff, #e9eef1 74%); }
+    .section-anchor { scroll-margin-top: 5rem; }
+    .product-disclosure summary { display: flex; min-height: 60px; cursor: pointer; list-style: none; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem 1.25rem; font-weight: 700; }
+    .product-disclosure summary::-webkit-details-marker { display: none; }
+    .product-disclosure summary:hover { background: #f8fafc; }
+    .disclosure-arrow { flex: 0 0 auto; font-size: 1.35rem; line-height: 1; transition: transform .2s ease; }
+    .product-disclosure[open] .disclosure-arrow { transform: rotate(180deg); }
+    .disclosure-content { padding: 0 1.25rem 1.25rem; }
+  </style>
+</head>
+<body class="min-h-screen text-slate-900">
+  <header class="sticky top-0 z-50 border-b border-slate-200 bg-white">
+    <nav class="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
+      <a href="index.html" class="flex items-center gap-3 text-base font-bold tracking-[.18em]"><span class="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-700 text-sm text-white">S</span>SHOPEASE</a>
+      <div class="flex items-center gap-2 sm:gap-4">
+        <a id="backToCategory" href="electronics.html" class="rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-100">← Category</a>
+        <a href="profile.html" class="hidden rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-100 sm:block">Profile</a>
+        <a href="cart.html" class="relative rounded-lg bg-slate-900 px-3 py-2 text-sm font-semibold text-white">Cart <span id="cartCount" class="ml-1 text-blue-200">0</span></a>
+      </div>
+    </nav>
+  </header>
+
+  <main id="productPage" class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+    <section class="grid gap-7 lg:grid-cols-[minmax(0,1.05fr)_minmax(360px,.95fr)] lg:gap-12">
+      <div class="product-image flex aspect-square max-h-[620px] items-center justify-center overflow-hidden rounded-xl border border-slate-200 p-5 sm:p-8">
+        <img id="productImage" class="h-full w-full object-contain" src="" alt="" />
+      </div>
+      <div class="flex flex-col py-1 lg:py-4">
+        <p id="productCategory" class="text-xs font-bold uppercase tracking-[.16em] text-emerald-700"></p>
+        <p class="mt-4 text-sm text-slate-500">ShopEase catalogue item</p>
+        <h1 id="productName" class="mt-1 text-3xl font-bold leading-tight sm:text-4xl"></h1>
+        <div class="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm">
+          <span class="rounded bg-emerald-50 px-2.5 py-1 font-semibold text-emerald-800">Available</span>
+          <span id="productRating" class="font-semibold text-slate-800"></span>
+          <span id="pastPurchaseSummary" class="text-slate-600">No past purchases found</span>
+        </div>
+        <div class="mt-3" aria-label="Rate this product">
+          <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Your rating</p>
+          <div id="ratingButtons" class="mt-1 flex gap-1" role="group" aria-label="Choose a rating from one to five stars">
+            <button type="button" data-rating="1" aria-label="Rate 1 out of 5" class="rating-star text-2xl text-slate-300 transition hover:text-amber-500">★</button>
+            <button type="button" data-rating="2" aria-label="Rate 2 out of 5" class="rating-star text-2xl text-slate-300 transition hover:text-amber-500">★</button>
+            <button type="button" data-rating="3" aria-label="Rate 3 out of 5" class="rating-star text-2xl text-slate-300 transition hover:text-amber-500">★</button>
+            <button type="button" data-rating="4" aria-label="Rate 4 out of 5" class="rating-star text-2xl text-slate-300 transition hover:text-amber-500">★</button>
+            <button type="button" data-rating="5" aria-label="Rate 5 out of 5" class="rating-star text-2xl text-slate-300 transition hover:text-amber-500">★</button>
+          </div>
+          <p id="ratingMessage" class="min-h-5 text-xs text-slate-500" role="status" aria-live="polite">Select a star to rate this item.</p>
+        </div>
+        <div class="mt-6 border-y border-slate-200 py-5">
+          <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Price</p>
+          <p id="productPrice" class="mt-1 text-3xl font-bold text-slate-950"></p>
+          <p class="mt-1 text-xs text-slate-500">Inclusive of applicable taxes</p>
+        </div>
+        <div class="mt-5 grid gap-3 sm:grid-cols-2">
+          <button id="addToCartButton" type="button" class="flex min-h-12 items-center justify-center gap-2 rounded-lg bg-amber-400 px-5 py-3 text-sm font-bold text-slate-950 transition hover:bg-amber-300"><span aria-hidden="true">＋</span>Add to Cart</button>
+          <button id="wishlistButton" type="button" class="flex min-h-12 items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-5 py-3 text-sm font-bold text-slate-800 transition hover:border-rose-300 hover:bg-rose-50"><span id="wishlistIcon" aria-hidden="true">♡</span><span id="wishlistLabel">Add to Wishlist</span></button>
+        </div>
+        <p id="actionMessage" class="min-h-6 pt-2 text-sm text-emerald-700" role="status" aria-live="polite"></p>
+        <a href="#aboutProduct" class="mt-2 inline-flex items-center gap-2 text-sm font-semibold text-blue-800 hover:text-blue-600">Scroll for product information <span aria-hidden="true">↓</span></a>
+      </div>
+    </section>
+
+    <section class="mt-8 overflow-hidden rounded-xl border border-slate-200 bg-white divide-y divide-slate-200">
+      <details id="aboutProduct" class="product-disclosure">
+        <summary><span>About this item</span><span class="disclosure-arrow" aria-hidden="true">⌄</span></summary>
+        <div class="disclosure-content"><p id="productDescription" class="max-w-4xl text-sm leading-7 text-slate-600"></p></div>
+      </details>
+      <details id="specifications" class="product-disclosure">
+        <summary><span>Product specifications</span><span class="disclosure-arrow" aria-hidden="true">⌄</span></summary>
+        <div class="disclosure-content">
+          <p class="mb-3 text-xs leading-5 text-slate-500">Sample catalogue specifications for demonstration. Confirm the exact configuration, features, and compatibility with the manufacturer before purchase.</p>
+          <dl id="specificationList" class="grid gap-px overflow-hidden rounded-lg border border-slate-200 bg-slate-200 sm:grid-cols-2"></dl>
+        </div>
+      </details>
+      <details id="brand" class="product-disclosure">
+        <summary><span>About the brand</span><span class="disclosure-arrow" aria-hidden="true">⌄</span></summary>
+        <div class="disclosure-content"><div class="max-w-4xl rounded-lg bg-slate-50 p-4">
+          <p id="brandName" class="font-bold text-slate-900"></p>
+          <p id="brandDescription" class="mt-2 text-sm leading-6 text-slate-600"></p>
+        </div></div>
+      </details>
+      <details id="boxContents" class="product-disclosure">
+        <summary><span>What’s in the box</span><span class="disclosure-arrow" aria-hidden="true">⌄</span></summary>
+        <div class="disclosure-content"><ul id="boxContentsList" class="grid gap-2 text-sm leading-6 text-slate-700 sm:grid-cols-2"></ul>
+          <p class="mt-3 text-xs leading-5 text-slate-500">Included accessories can vary by exact model and product variant. Check the sealed package contents for the selected item.</p>
+        </div>
+      </details>
+      <details id="warranty" class="product-disclosure">
+        <summary><span>Warranty details</span><span class="disclosure-arrow" aria-hidden="true">⌄</span></summary>
+        <div class="disclosure-content"><div class="max-w-4xl rounded-lg border border-slate-200 bg-slate-50 p-4">
+          <p class="font-semibold text-slate-900">Manufacturer warranty</p>
+          <p class="mt-2 text-sm leading-6 text-slate-600">Warranty duration and service coverage depend on the manufacturer and exact model. Refer to the product invoice and warranty card for confirmed coverage and service-center details.</p>
+        </div></div>
+      </details>
+      <details id="purchaseHistory" class="product-disclosure" open>
+        <summary><span>Past purchases and reviews</span><span class="disclosure-arrow" aria-hidden="true">⌄</span></summary>
+        <div class="disclosure-content">
+          <div class="mb-3 flex flex-wrap items-end justify-between gap-3">
+            <p class="text-sm text-slate-500">Your previous orders containing this item.</p>
+            <a href="orders.html" class="text-sm font-semibold text-blue-800 hover:text-blue-600">View all orders</a>
+          </div>
+          <div id="purchaseHistoryList" class="grid gap-3 sm:grid-cols-2"></div>
+          <div class="mt-6 border-t border-slate-200 pt-5">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <h3 class="text-lg font-bold text-slate-900">Sample product reviews</h3>
+              <span class="rounded-full bg-amber-100 px-3 py-1 text-xs font-bold uppercase tracking-wide text-amber-900">Demo content</span>
+            </div>
+            <p class="mt-1 text-xs text-slate-600">These positive examples are for demonstration only. They are not real customer reviews.</p>
+            <div id="demoReviews" class="mt-4 grid gap-3 sm:grid-cols-2"></div>
+          </div>
+        </div>
+      </details>
+    </section>
+  </main>
+
+  <div id="toast" class="pointer-events-none fixed inset-x-4 bottom-5 z-30 mx-auto hidden max-w-sm rounded-lg bg-slate-900 px-4 py-3 text-center text-sm font-semibold text-white shadow-lg" role="status" aria-live="polite"></div>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const storedProduct = JSON.parse(localStorage.getItem('shopease_selected_product') || 'null');
+    const product = storedProduct && storedProduct.name === params.get('name')
+      ? storedProduct
+      : null;
+    const money = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 });
+    const cartKey = 'shopease_cart';
+    const wishlistKey = 'shopease_wishlist';
+    const ratingKey = 'shopease_product_ratings';
+    const demoReviewsByCategory = {
+      Audio: [
+        ['Enjoyable everyday listening', 'Demo feedback: this is an appealing choice for music, podcasts, and calls.'],
+        ['A handy audio pick', 'Demo feedback: a convenient-looking option for an everyday listening setup.']
+      ],
+      Mobiles: [
+        ['A practical everyday device', 'Demo feedback: this sample listing makes an appealing all-rounder for daily use.'],
+        ['A polished phone option', 'Demo feedback: a promising choice for communication, apps, and entertainment.']
+      ],
+      Computing: [
+        ['A versatile computing pick', 'Demo feedback: this sample listing suits a range of study and work setups.'],
+        ['A practical option for everyday tasks', 'Demo feedback: an appealing choice for browsing, productivity, and learning.']
+      ],
+      Wearables: [
+        ['A useful everyday companion', 'Demo feedback: this sample wearable is an appealing fit for daily routines.'],
+        ['A convenient wearable option', 'Demo feedback: a promising way to keep useful features close at hand.']
+      ],
+      Accessories: [
+        ['A practical addition to a setup', 'Demo feedback: this sample accessory is an appealing everyday pick.'],
+        ['Simple and convenient', 'Demo feedback: a handy-looking option to complement a device setup.']
+      ],
+      Gaming: [
+        ['A fun entertainment pick', 'Demo feedback: this sample listing looks like an appealing addition to a gaming setup.'],
+        ['A promising gaming option', 'Demo feedback: a fun-looking choice for play and entertainment.']
+      ],
+      Cameras: [
+        ['A promising camera option', 'Demo feedback: this sample listing is an appealing pick for photo and video fans.'],
+        ['Ready for everyday adventures', 'Demo feedback: a handy-looking option for capturing memorable moments.']
+      ],
+      'Smart Home': [
+        ['A useful connected-home pick', 'Demo feedback: this sample listing is an appealing starting point for a smart-home setup.'],
+        ['A convenient home option', 'Demo feedback: a promising way to make everyday routines feel simpler.']
+      ]
+    };
+    const escapeHTML = value => String(value || '').replace(/[&<>"']/g, character => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    })[character]);
+
+    function showMissingProduct() {
+      document.getElementById('productPage').innerHTML = '<div class="rounded-xl border border-slate-200 bg-white p-8 text-center"><h1 class="text-2xl font-bold">Product not found</h1><p class="mt-2 text-slate-600">Open a product from the electronics category to view its details.</p><a href="electronics.html" class="mt-5 inline-flex rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white">Browse electronics</a></div>';
+    }
+    function getBrand(name) {
+      const brands = ['Apple', 'Samsung', 'Sony', 'OnePlus', 'Google', 'Pixel', 'Galaxy', 'Xiaomi', 'Motorola', 'Oppo', 'Vivo', 'JBL', 'boAt', 'Bose', 'Noise', 'Sennheiser', 'Skullcandy', 'Anker', 'Realme', 'Zebronics', 'Jabra', 'Beats', 'Philips', 'Tribit', 'Marshall', 'Nothing'];
+      return brands.find(brand => name.toLowerCase().startsWith(brand.toLowerCase())) || 'ShopEase catalogue selection';
+    }
+    function detailsForCategory(category) {
+      const descriptions = {
+        Audio: 'Enjoy your everyday listening with this audio product. Review the model specifications and in-box contents before purchase to confirm the features and accessories that matter to you.',
+        Computing: 'A computing product selected for work, study, and everyday use. Check the specifications below for the catalogue information available for this listing.',
+        Mobiles: 'A mobile device listing for communication, apps, and entertainment. Confirm model-specific network, storage, and included accessories with the product packaging.',
+        Wearables: 'A wearable device for everyday routines. Compatibility and health or fitness features depend on the exact model and paired device.',
+        Accessories: 'An accessory selected to complement your devices. Check the exact model and compatibility information on the product packaging.',
+        Gaming: 'A gaming product for play and entertainment. Supported games and compatible accessories depend on the exact model.',
+        Cameras: 'A camera product for capturing photos and video. Recording modes and included accessories vary by model.',
+        'Smart Home': 'A smart-home product designed to fit into a connected home setup. Check device compatibility and setup requirements for the exact model.'
+      };
+      return descriptions[category] || `Explore this ${category.toLowerCase()} product from the ShopEase catalogue.`;
+    }
+    function technicalSpecsForProduct(item) {
+      const name = item.name.toLowerCase();
+      const product = [
+        ['Product', item.name],
+        ['Category', item.category],
+        ['Listed price', money.format(item.price)],
+        ['Brand', getBrand(item.name)]
+      ];
+      const categorySpecs = {
+        Mobiles: [
+          ['Memory (RAM)', '8 GB (sample configuration)'],
+          ['Storage', '128 GB (sample configuration)'],
+          ['Display', '6.1-inch OLED (sample configuration)'],
+          ['Rear camera', '50 MP main camera (sample configuration)'],
+          ['Network', '5G support (model dependent)'],
+          ['Battery', '4,500 mAh (sample configuration)']
+        ],
+        Computing: [
+          ['Memory (RAM)', '16 GB (sample configuration)'],
+          ['Storage', '512 GB SSD (sample configuration)'],
+          ['Display', '15.6-inch Full HD (sample configuration)'],
+          ['Processor', 'Multi-core processor; exact chipset varies by model'],
+          ['Operating system', name.includes('apple') ? 'macOS (model dependent)' : 'Windows (model dependent)'],
+          ['Graphics', 'Integrated graphics (sample configuration)']
+        ],
+        Audio: name.includes('speaker') || name.includes('soundbar') || name.includes('homepod')
+          ? [
+            ['Product type', 'Wireless speaker (sample listing)'],
+            ['Noise cancellation', 'Not applicable to this speaker listing'],
+            ['Connectivity', 'Bluetooth wireless (sample listing)'],
+            ['Battery', 'Model dependent; verify product listing'],
+            ['Audio controls', 'On-device controls (model dependent)']
+          ]
+          : [
+            ['Product type', name.includes('earbud') || name.includes('buds') || name.includes('airpods') ? 'Wireless earbuds (sample listing)' : 'Wireless headphones (sample listing)'],
+            ['Noise cancellation', name.includes('noise cancelling') || name.includes('quietcomfort') || name.includes('wh headphone') ? 'Active noise cancellation (sample listing)' : 'Model dependent; check exact listing'],
+            ['Connectivity', 'Bluetooth wireless (sample listing)'],
+            ['Battery life', 'Up to 30 hours (sample listing; varies with ANC and volume)'],
+            ['Microphone', 'Built-in microphone (sample listing)']
+          ],
+        Wearables: [
+          ['Display', 'AMOLED display (sample configuration)'],
+          ['Battery life', 'Up to 7 days (sample listing; usage dependent)'],
+          ['Connectivity', 'Bluetooth (sample listing)'],
+          ['Water resistance', 'Model dependent; check exact rating'],
+          ['Phone compatibility', 'Android and iOS support varies by model']
+        ],
+        Accessories: [
+          ['Connection', 'USB or 2.4 GHz wireless (varies by accessory)'],
+          ['Compatibility', 'Model and operating-system dependent'],
+          ['Power', 'USB powered or battery powered (model dependent)'],
+          ['Included software', 'Refer to the exact product listing']
+        ],
+        Gaming: [
+          ['Storage', '1 TB (sample configuration; model dependent)'],
+          ['Video output', 'Up to 4K (game and display dependent)'],
+          ['Connectivity', 'HDMI, USB, and wireless (model dependent)'],
+          ['Included controller', 'Check exact package contents']
+        ],
+        Cameras: [
+          ['Resolution', '24 MP (sample configuration)'],
+          ['Video', '4K recording (sample configuration)'],
+          ['Lens mount', 'Model specific; verify before choosing a lens'],
+          ['Storage media', 'Memory card type is model dependent']
+        ],
+        'Smart Home': [
+          ['Connectivity', 'Wi-Fi and Bluetooth (sample listing)'],
+          ['Voice assistant', 'Platform and model dependent'],
+          ['Compatibility', 'Check supported devices and smart-home platform'],
+          ['Power', 'USB or mains powered (model dependent)']
+        ]
+      };
+      return [...product, ...(categorySpecs[item.category] || [['Technical details', 'Check the manufacturer listing for this model']])];
+    }
+    function renderProduct() {
+      if (!product) {
+        showMissingProduct();
+        return;
+      }
+      document.title = `${product.name} - ShopEase`;
+      document.getElementById('productName').textContent = product.name;
+      document.getElementById('productCategory').textContent = product.category;
+      document.getElementById('productPrice').textContent = money.format(product.price);
+      const sampleRating = Number(product.sampleRating) || 4.5;
+      const purchaseFloor = Number(product.samplePurchaseFloor) || 10000;
+      const purchaseLabel = purchaseFloor >= 10000 ? '10k+' : `${purchaseFloor.toLocaleString('en-IN')}+`;
+      const productRating = document.getElementById('productRating');
+      productRating.innerHTML = `<span class="text-amber-500" aria-hidden="true">★★★★★</span> ${sampleRating.toFixed(1)}/5 · ${purchaseLabel} bought <span class="text-xs font-normal text-slate-500">(sample)</span>`;
+      productRating.setAttribute('aria-label', `Sample rating ${sampleRating.toFixed(1)} out of 5, sample purchases ${purchaseLabel}`);
+      const image = document.getElementById('productImage');
+      image.src = product.image;
+      image.alt = product.name;
+      document.getElementById('productDescription').textContent = detailsForCategory(product.category);
+      const brand = getBrand(product.name);
+      document.getElementById('brandName').textContent = brand;
+      document.getElementById('brandDescription').textContent = brand === 'ShopEase catalogue selection'
+        ? 'This listing is presented in the ShopEase catalogue. Manufacturer details were not supplied with the catalogue item.'
+        : `${brand} is the brand named in this catalogue listing. Product support and service terms are provided by the manufacturer for the exact model.`;
+      const specs = technicalSpecsForProduct(product);
+      document.getElementById('specificationList').innerHTML = specs.map(([label, value]) => `<div class="bg-white p-4"><dt class="text-xs font-semibold uppercase tracking-wide text-slate-500">${escapeHTML(label)}</dt><dd class="mt-1 text-sm font-medium leading-6 text-slate-800">${escapeHTML(value)}</dd></div>`).join('');
+      const boxItems = ['1 × ' + product.name, 'Product documentation (where supplied)'];
+      document.getElementById('boxContentsList').innerHTML = boxItems.map(item => `<li class="flex gap-2"><span class="text-emerald-700" aria-hidden="true">✓</span><span>${escapeHTML(item)}</span></li>`).join('');
+      document.getElementById('backToCategory').href = `electronics.html?category=${encodeURIComponent(product.category)}`;
+      updateCartCount();
+      updateWishlistButton();
+      updateRatingDisplay();
+      loadPurchaseHistory();
+      renderDemoReviews();
+    }
+    function renderDemoReviews() {
+      const reviews = demoReviewsByCategory[product.category] || demoReviewsByCategory.Accessories;
+      document.getElementById('demoReviews').innerHTML = reviews.map(([title, body]) => `
+        <article class="rounded-lg border border-slate-200 bg-slate-50 p-4">
+          <div class="flex items-center justify-between gap-3">
+            <span class="text-amber-500" aria-label="5 out of 5 stars">★★★★★</span>
+            <span class="text-[10px] font-bold uppercase tracking-wide text-slate-500">Demo review</span>
+          </div>
+          <h4 class="mt-2 font-semibold text-slate-900">${escapeHTML(title)}</h4>
+          <p class="mt-1 text-sm leading-6 text-slate-600">${escapeHTML(body)}</p>
+          <p class="mt-2 text-xs text-slate-500">${escapeHTML(product.name)} · Example only</p>
+        </article>
+      `).join('');
+    }
+    function getProductRating() {
+      try {
+        const ratings = JSON.parse(localStorage.getItem(ratingKey) || '{}');
+        return Number(ratings[product.name]) || 0;
+      } catch {
+        return 0;
+      }
+    }
+    function updateRatingDisplay() {
+      const rating = getProductRating();
+      document.getElementById('ratingMessage').textContent = rating
+        ? `Your rating: ${rating}/5`
+        : 'Select a star to rate this item.';
+      document.querySelectorAll('.rating-star').forEach(star => {
+        const selected = Number(star.dataset.rating) <= rating;
+        star.classList.toggle('text-amber-500', selected);
+        star.classList.toggle('text-slate-300', !selected);
+        star.setAttribute('aria-pressed', String(Number(star.dataset.rating) === rating));
+      });
+    }
+    async function loadAccountProductData() {
+      const email = localStorage.getItem('shopease_user_email');
+      if (!email || !product) return;
+      try {
+        const [wishlistResponse, ratingsResponse] = await Promise.all([
+          fetch(`/api/wishlist?email=${encodeURIComponent(email)}`),
+          fetch(`/api/ratings?email=${encodeURIComponent(email)}`)
+        ]);
+        const wishlistData = await wishlistResponse.json();
+        const ratingsData = await ratingsResponse.json();
+        if (!wishlistResponse.ok) throw new Error(wishlistData.error || 'Unable to load wishlist');
+        if (!ratingsResponse.ok) throw new Error(ratingsData.error || 'Unable to load ratings');
+        localStorage.setItem(wishlistKey, JSON.stringify(wishlistData.items || []));
+        localStorage.setItem(ratingKey, JSON.stringify(ratingsData.ratings || {}));
+        updateWishlistButton();
+        updateRatingDisplay();
+      } catch (error) {
+        console.warn('Could not load saved product data', error);
+      }
+    }
+    document.getElementById('ratingButtons').addEventListener('click', async event => {
+      const star = event.target.closest('[data-rating]');
+      if (!star || !product) return;
+      let ratings = {};
+      try { ratings = JSON.parse(localStorage.getItem(ratingKey) || '{}'); } catch { ratings = {}; }
+      ratings[product.name] = Number(star.dataset.rating);
+      localStorage.setItem(ratingKey, JSON.stringify(ratings));
+      updateRatingDisplay();
+      const email = localStorage.getItem('shopease_user_email');
+      if (!email) return;
+      try {
+        const response = await fetch('/api/ratings', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, name: product.name, rating: ratings[product.name] })
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Unable to save rating');
+      } catch (error) {
+        console.warn('Could not save rating to account', error);
+        showToast('Rating saved on this device, but could not sync to your account');
+      }
+    });
+    function getCart() { return JSON.parse(localStorage.getItem(cartKey) || '[]'); }
+    function updateCartCount() {
+      document.getElementById('cartCount').textContent = getCart().reduce((count, item) => count + Number(item.quantity || 0), 0);
+    }
+    async function syncCartToBackend(cart) {
+      const response = await fetch('/api/cart', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ items: cart })
+      });
+      if (response.status === 401) return false;
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Unable to save cart to your account');
+      return true;
+    }
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.remove('hidden');
+      window.setTimeout(() => toast.classList.add('hidden'), 2000);
+    }
+    document.getElementById('addToCartButton').addEventListener('click', async () => {
+      if (!product) return;
+      const cart = getCart();
+      const existing = cart.find(item => item.name === product.name);
+      if (existing) existing.quantity = Number(existing.quantity || 0) + 1;
+      else cart.push({ ...product, quantity: 1 });
+      localStorage.setItem(cartKey, JSON.stringify(cart));
+      updateCartCount();
+      try {
+        const synced = await syncCartToBackend(cart);
+        showToast(synced
+          ? `${product.name} added to your cart`
+          : 'Added on this device. Sign in to save your cart.');
+      } catch (error) {
+        console.warn('Could not sync cart to backend', error);
+        showToast('Added on this device, but could not save to your account.');
+      }
+    });
+    function getWishlist() { return JSON.parse(localStorage.getItem(wishlistKey) || '[]'); }
+    function updateWishlistButton() {
+      if (!product) return;
+      const saved = getWishlist().some(item => item.name === product.name);
+      document.getElementById('wishlistIcon').textContent = saved ? '♥' : '♡';
+      document.getElementById('wishlistLabel').textContent = saved ? 'Remove from Wishlist' : 'Add to Wishlist';
+      document.getElementById('wishlistButton').classList.toggle('border-rose-300', saved);
+      document.getElementById('wishlistButton').classList.toggle('bg-rose-50', saved);
+      document.getElementById('wishlistIcon').classList.toggle('text-rose-600', saved);
+    }
+    document.getElementById('wishlistButton').addEventListener('click', async () => {
+      if (!product) return;
+      const wishlist = getWishlist();
+      const index = wishlist.findIndex(item => item.name === product.name);
+      if (index >= 0) wishlist.splice(index, 1);
+      else wishlist.push(product);
+      localStorage.setItem(wishlistKey, JSON.stringify(wishlist));
+      updateWishlistButton();
+      showToast(index >= 0 ? 'Removed from wishlist' : 'Added to wishlist');
+      const email = localStorage.getItem('shopease_user_email');
+      if (!email) return;
+      try {
+        const response = await fetch('/api/wishlist', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, items: wishlist })
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Unable to save wishlist');
+      } catch (error) {
+        console.warn('Could not save wishlist to account', error);
+        showToast('Wishlist saved on this device, but could not sync to your account');
+      }
+    });
+    function renderPurchaseHistory(orders) {
+      const matches = orders.flatMap(order => (order.items || [])
+        .filter(item => item.name === product.name)
+        .map(item => ({ order, item })));
+      const summary = document.getElementById('pastPurchaseSummary');
+      const history = document.getElementById('purchaseHistoryList');
+      const quantityPurchased = matches.reduce((sum, entry) => sum + Number(entry.item.quantity || 1), 0);
+      summary.textContent = quantityPurchased
+        ? `Purchased ${quantityPurchased} time${quantityPurchased === 1 ? '' : 's'}`
+        : 'No past purchases found';
+      history.innerHTML = matches.length
+        ? matches.map(({ order, item }) => `<article class="rounded-lg border border-slate-200 bg-white p-4"><p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Order ${escapeHTML(order.id || 'purchase')}</p><p class="mt-2 font-semibold">${escapeHTML(item.name)} <span class="font-normal text-slate-600">× ${Number(item.quantity || 1)}</span></p><p class="mt-1 text-sm text-slate-600">${escapeHTML(order.status || 'Order placed')}${order.createdAt ? ` · ${new Date(order.createdAt).toLocaleDateString('en-IN')}` : ''}</p></article>`).join('')
+        : '<p class="rounded-lg border border-dashed border-slate-300 bg-white p-5 text-sm text-slate-500 sm:col-span-2">No previous orders for this item.</p>';
+    }
+    async function loadPurchaseHistory() {
+      const email = localStorage.getItem('shopease_user_email');
+      let orders = JSON.parse(localStorage.getItem('shopease_orders') || '[]');
+      if (email) {
+        try {
+          const response = await fetch(`/api/orders?email=${encodeURIComponent(email)}`);
+          if (response.ok) orders = (await response.json()).orders || orders;
+        } catch (error) {
+          console.warn('Could not load past purchases', error);
+        }
+      }
+      renderPurchaseHistory(orders);
+    }
+    renderProduct();
+    loadAccountProductData();
+  </script>
+</body>
+</html>

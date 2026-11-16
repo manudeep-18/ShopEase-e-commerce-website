@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Order Details - ShopEase</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <style>
+    body { font-family: Inter, sans-serif; background: radial-gradient(circle at top left, rgba(59,130,246,.15), transparent 35%), #0b1120; color: #e2e8f0; }
+    .glass { background: rgba(15,23,42,0.82); border: 1px solid rgba(148,163,184,0.2); }
+    .status-badge { border-radius: 9999px; padding: 0.35rem 0.8rem; font-size: 0.75rem; font-weight: 700; }
+  </style>
+</head>
+<body class="min-h-screen px-4 py-10 text-slate-100">
+  <div class="mx-auto max-w-6xl">
+    <div class="mb-8 flex items-center justify-between">
+      <div>
+        <p class="text-xs uppercase tracking-[0.25em] text-blue-300">Order tracking</p>
+        <h1 class="mt-2 text-3xl font-bold">Order details</h1>
+      </div>
+      <a href="index.html" class="rounded-full border border-slate-600 px-4 py-2 text-sm font-medium text-slate-100 hover:border-blue-400 hover:text-white">← Back to home</a>
+    </div>
+
+    <div id="orderCard" class="glass rounded-3xl p-6 shadow-2xl"></div>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const orderId = params.get('id');
+    const orderCard = document.getElementById('orderCard');
+
+    function getStatusClass(status) {
+      const map = {
+        Packed: 'bg-sky-500/15 text-sky-200 border border-sky-400/30',
+        Dispatched: 'bg-violet-500/15 text-violet-200 border border-violet-400/30',
+        'Out for Delivery': 'bg-amber-500/15 text-amber-200 border border-amber-400/30',
+        Delivered: 'bg-emerald-500/15 text-emerald-200 border border-emerald-400/30',
+        'Return Requested': 'bg-pink-500/15 text-pink-200 border border-pink-400/30',
+        'Replacement Requested': 'bg-orange-500/15 text-orange-200 border border-orange-400/30',
+        'Refund Processing': 'bg-red-500/15 text-red-200 border border-red-400/30',
+        Refunded: 'bg-rose-500/15 text-rose-200 border border-rose-400/30',
+        Returned: 'bg-cyan-500/15 text-cyan-200 border border-cyan-400/30'
+      };
+      return map[status] || 'bg-slate-500/15 text-slate-200 border border-slate-400/30';
+    }
+
+    function renderTimeline(status) {
+      const statuses = ['Packed', 'Dispatched', 'Out for Delivery', 'Delivered'];
+      const serviceStatus = ['Return Requested', 'Replacement Requested', 'Refund Processing', 'Refunded', 'Returned'].includes(status);
+      const activeIndex = statuses.indexOf(status);
+      const currentIndex = serviceStatus ? statuses.length - 1 : activeIndex;
+      const trackProgress = currentIndex < 0 ? 0 : (currentIndex / (statuses.length - 1)) * 100;
+      const serviceLabel = serviceStatus ? status : 'Delivery journey';
+
+      return `
+        <div class="overflow-x-auto pb-2">
+          <div class="min-w-[620px]">
+            <div class="relative px-5">
+              <div class="absolute left-10 right-10 top-5 h-1 rounded-full bg-slate-700"></div>
+              <div class="absolute left-10 top-5 h-1 rounded-full bg-gradient-to-r from-blue-500 to-cyan-300" style="width: calc(${trackProgress}% - 2.5rem); max-width: calc(100% - 5rem);"></div>
+              <div class="relative grid grid-cols-4">
+                ${statuses.map((step, index) => {
+                  const isActive = index <= currentIndex;
+                  const isCurrent = serviceStatus ? index === statuses.length - 1 : index === activeIndex;
+                  return `
+                    <div class="flex flex-col items-center text-center">
+                      <div class="flex h-10 w-10 items-center justify-center rounded-full border-4 ${isActive ? 'border-blue-400 bg-blue-500 text-white shadow-lg shadow-blue-950/40' : 'border-slate-600 bg-slate-800 text-slate-500'} ${isCurrent ? 'ring-4 ring-blue-400/20' : ''}">
+                        ${isActive ? '<span aria-hidden="true">✓</span>' : '<span class="h-2 w-2 rounded-full bg-current"></span>'}
+                      </div>
+                      <span class="mt-3 text-xs font-semibold ${isActive ? 'text-white' : 'text-slate-400'}">${step}</span>
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+            </div>
+            <div class="mt-7 rounded-xl border border-blue-400/20 bg-blue-500/10 px-4 py-3 text-center text-sm text-blue-100">
+              Current update: <strong>${serviceLabel}</strong>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    async function loadOrder() {
+      const localOrders = JSON.parse(localStorage.getItem('shopease_orders') || '[]');
+      const localOrder = localOrders.find(item => item.id === orderId) || null;
+      if (localOrder) {
+        renderOrder(localOrder);
+        return;
+      }
+
+      try {
+        const response = await fetch(`/api/orders/${orderId}`);
+        if (!response.ok) throw new Error('Order not found');
+        const data = await response.json();
+        renderOrder(data.order);
+      } catch (error) {
+        orderCard.innerHTML = `
+          <div class="rounded-2xl border border-red-500/30 bg-red-500/10 p-8 text-center text-red-200">
+            <h2 class="text-2xl font-bold">Order not found</h2>
+            <p class="mt-2 text-red-100/80">The requested order could not be loaded.</p>
+          </div>
+        `;
+      }
+    }
+
+    function renderOrder(order) {
+      const items = order.items || [];
+      const total = Number(order.total || 0);
+      const status = order.status || 'Packed';
+      const quickActions = status === 'Delivered'
+        ? [
+            { label: 'Request return', nextStatus: 'Refund Processing', style: 'border-pink-500/50 bg-pink-500/10 text-pink-100 hover:bg-pink-500/20' },
+            { label: 'Request replacement', nextStatus: 'Replacement Requested', style: 'border-orange-500/50 bg-orange-500/10 text-orange-100 hover:bg-orange-500/20' }
+          ]
+        : [];
+
+      orderCard.innerHTML = `
+        <div class="grid gap-8 lg:grid-cols-[1.3fr_0.7fr]">
+          <div>
+            <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p class="text-xs uppercase tracking-[0.2em] text-slate-400">Order ID</p>
+                <h2 class="mt-2 text-2xl font-bold text-white">${order.id}</h2>
+              </div>
+              <span class="status-badge ${getStatusClass(status)}">${status}</span>
+            </div>
+
+            <div class="rounded-2xl border border-slate-700 bg-slate-900/80 p-5">
+              <h3 class="mb-4 text-xl font-semibold text-white">Status timeline</h3>
+              <div class="space-y-3">${renderTimeline(status)}</div>
+            </div>
+
+            <div class="mt-6 rounded-2xl border border-slate-700 bg-slate-900/80 p-5">
+              <h3 class="mb-4 text-xl font-semibold text-white">Products</h3>
+              <div class="space-y-4">
+                ${items.map(item => `
+                  <div class="flex items-center justify-between gap-4 border-b border-slate-700 pb-3 last:border-b-0 last:pb-0">
+                    <div>
+                      <p class="font-medium text-white">${item.name}</p>
+                      <p class="text-sm text-slate-400">Qty: ${item.quantity}</p>
+                    </div>
+                    <p class="font-medium text-blue-200">₹${Number(item.price).toLocaleString('en-IN')}</p>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          </div>
+
+          <div class="space-y-6">
+            <div class="rounded-2xl border border-slate-700 bg-slate-900/80 p-5">
+              <h3 class="mb-4 text-xl font-semibold text-white">Order summary</h3>
+              <div class="space-y-3 text-sm text-slate-300">
+                <div class="flex justify-between"><span>Total</span><span class="font-semibold text-white">₹${total.toLocaleString('en-IN')}</span></div>
+                <div class="flex justify-between"><span>Delivery agent</span><span>${order.deliveryAgent || 'Rahul Verma'}</span></div>
+                <div class="flex justify-between"><span>Placed</span><span>${new Date(order.createdAt || Date.now()).toLocaleString()}</span></div>
+              </div>
+            </div>
+
+            <div class="rounded-2xl border border-slate-700 bg-slate-900/80 p-5">
+              <h3 class="mb-4 text-xl font-semibold text-white">Quick actions</h3>
+              ${quickActions.length
+                ? `<div class="space-y-3">${quickActions.map(action => `
+                    <button data-action="${action.nextStatus}" class="status-btn w-full rounded-xl border px-4 py-2 text-sm font-medium ${action.style}">${action.label}</button>
+                  `).join('')}</div>`
+                : '<p class="text-sm text-slate-400">No service actions are available for this order status.</p>'}
+            </div>
+          </div>
+        </div>
+      `;
+
+      document.querySelectorAll('.status-btn').forEach(button => {
+        button.addEventListener('click', async () => {
+          const nextStatus = button.dataset.action;
+          const updated = { ...order, status: nextStatus };
+          const localOrders = JSON.parse(localStorage.getItem('shopease_orders') || '[]');
+          const index = localOrders.findIndex(item => item.id === order.id);
+
+          try {
+            await fetch(`/api/orders/${order.id}/status`, {
+              method: 'PATCH',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ status: nextStatus })
+            });
+          } catch (error) {
+            console.warn('Could not sync order status to backend', error);
+          }
+
+          if (index >= 0) {
+            localOrders[index] = updated;
+            localStorage.setItem('shopease_orders', JSON.stringify(localOrders));
+          }
+          renderOrder(updated);
+        });
+      });
+    }
+
+    loadOrder();
+  </script>
+</body>
+</html>

@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ShopEase</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script src="address-selector.js" defer></script>
+<style data-purpose="custom-styles">
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+    .hero-gradient {
+      background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+    }
+    .text-gradient {
+      background: linear-gradient(to right, #818cf8, #a78bfa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero-image {
+      animation: hero-float 4s ease-in-out infinite;
+    }
+    @keyframes hero-float {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #2ecc71;
+      color: #fff;
+      padding: 14px 22px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 14px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      opacity: 0;
+      transform: translateY(12px);
+      pointer-events: none;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      z-index: 100;
+    }
+    #toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    html { scroll-behavior: smooth; }
+  </style>
+</head>
+<body class="bg-white text-gray-800 antialiased">
+
+<!-- BEGIN: Navigation -->
+<nav class="sticky top-0 bg-[#0b1120] text-white px-8 py-6 w-full z-50">
+  <div class="max-w-7xl mx-auto flex justify-between items-center">
+    <div class="flex items-center gap-3">
+      <svg fill="none" height="24" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M6 2L3 6V20C3 20.5304 3.21071 21.0391 3.58579 21.4142C3.96086 21.7893 4.46957 22 5 22H19C19.5304 22 20.0391 21.7893 20.4142 21.4142C20.7893 21.0391 21 20.5304 21 20V6L18 2H6Z" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+        <path d="M3 6H21" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+        <path d="M16 10C16 11.0609 15.5786 12.0783 14.8284 12.8284C14.0783 13.5786 13.0609 14 12 14C10.9391 14 9.92172 13.5786 9.17157 12.8284C8.42143 12.0783 8 11.0609 8 10" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+      </svg>
+      <span class="text-xl font-bold tracking-widest uppercase">ShopEase</span>
+    </div>
+    <div class="hidden md:flex items-center gap-8 text-sm font-medium">
+      <a class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full font-medium transition-all duration-300 hover:translate-x-1" href="#home">Home</a>
+      <a class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full font-medium transition-all duration-300 hover:translate-x-1" href="#products">Products</a>
+      <a class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full font-medium transition-all duration-300 hover:translate-x-1" href="#offers">Offers</a>
+      <a class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full font-medium transition-all duration-300 hover:translate-x-1" href="#categories">Categories</a>
+      <a class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full font-medium transition-all duration-300 hover:translate-x-1" href="orders.html">Orders</a>
+      <a class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full font-medium transition-all duration-300 hover:translate-x-1" href="#contact">Contact</a>
+    </div>
+    <div class="flex items-center gap-6">
+      <div id="accountBox" class="hidden items-center gap-3">
+        <a id="accountLink" href="profile.html" class="flex items-center gap-2 rounded-full border border-blue-500/50 bg-blue-600/10 px-3 py-2 text-sm font-medium text-white hover:bg-blue-600/20">
+          <svg fill="none" height="20" viewbox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+          </svg>
+          <span id="accountName">My Account</span>
+        </a>
+        <button id="logoutBtn" type="button" class="text-sm text-gray-300 hover:text-white">Logout</button>
+      </div>
+      <a id="loginLink" href="login.html" class="text-gray-400 hover:text-white transition-colors flex items-center gap-2" title="Sign In">
+        <svg fill="none" height="24" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+        </svg>
+        <span class="hidden md:inline text-sm font-medium">Login</span>
+      </a>
+      <button class="relative text-gray-400 hover:text-white transition-colors" id="cartBtn" aria-label="Cart" type="button">
+        <svg fill="none" height="24" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M3 3H5L5.4 5M7 13H17L21 5H5.4M7 13L5.4 5M7 13L4.70711 15.2929C4.07714 15.9229 4.52331 17 5.41421 17H17M17 17C15.8954 17 15 17.8954 15 19C15 20.1046 15.8954 21 17 21C18.1046 21 19 20.1046 19 19C19 17.8954 18.1046 17 17 17ZM9 19C9 20.1046 8.10457 21 7 21C5.89543 21 5 20.1046 5 19C5 17.8954 5.89543 17 7 17C8.10457 17 9 17.8954 9 19Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+        </svg>
+        <span id="cartCount" class="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">0</span>
+      </button>
+      <a href="#products" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full font-medium transition-colors">
+        Shop Now
+      </a>
+    </div>
+  </div>
+</nav>
+<!-- END: Navigation -->
+
+<!-- BEGIN: Hero Section -->
+<header id="home" class="hero-gradient pt-16 pb-24 px-8 relative overflow-hidden rounded-b-[3rem]">
+  <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between">
+    <div class="md:w-1/2 z-10">
+      <h1 class="text-5xl md:text-7xl font-bold text-white leading-tight mb-6">
+        Shop smarter<br/>
+        with <span class="text-gradient">ShopEase</span>
+      </h1>
+      <p class="text-gray-400 text-lg mb-10 max-w-md">
+        Explore top-rated electronics, accessories, and gadgets with fast delivery and secure checkout.
+      </p>
+      <div class="flex flex-wrap gap-4">
+        <a href="#products" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-full font-medium flex items-center gap-2 transition-colors">
+          Shop Now
+          <svg fill="none" height="20" viewbox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg">
+            <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+          </svg>
+        </a>
+        <a href="#categories" class="border border-gray-600 text-white hover:border-gray-400 px-8 py-3 rounded-full font-medium transition-colors">
+          Explore More
+        </a>
+      </div>
+    </div>
+    <div class="md:w-1/2 relative mt-16 md:mt-0 flex justify-center z-10">
+      <img alt="Smartphone and headphones" class="hero-image max-w-full h-auto drop-shadow-2xl rounded-2xl" src="https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?w=600&q=80"/>
+    </div>
+  </div>
+</header>
+<!-- END: Hero Section -->
+
+<!-- BEGIN: Value Props -->
+<section class="bg-[#1e293b] py-8 rounded-[2rem] mx-4 -mt-10 relative z-20 shadow-xl max-w-7xl lg:mx-auto">
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-8 px-8 divide-x divide-gray-700">
+    <div class="flex items-center gap-4 px-4">
+      <div class="text-gray-400">
+        <svg fill="none" height="24" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+        </svg>
+      </div>
+      <div class="text-sm">
+        <p class="text-white font-medium">Fast</p>
+        <p class="text-gray-400">Shipping</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-4 px-4">
+      <div class="text-gray-400">
+        <svg fill="none" height="24" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M16 4H18C19.1046 4 20 4.89543 20 6V20C20 21.1046 19.1046 22 18 22H6C4.89543 22 4 21.1046 4 20V6C4 4.89543 4.89543 4 6 4H8M16 4V2C16 1.44772 15.5523 1 15 1H9C8.44772 1 8 1.44772 8 2V4M16 4H8M12 14V14.01" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+        </svg>
+      </div>
+      <div class="text-sm">
+        <p class="text-white font-medium">Secure</p>
+        <p class="text-gray-400">Checkout</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-4 px-4">
+      <div class="text-gray-400">
+        <svg fill="none" height="24" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M18 8H19C20.1046 8 21 8.89543 21 10V11C21 12.1046 20.1046 13 19 13H18M18 8V17C18 18.6569 16.6569 20 15 20H5C3.34315 20 2 18.6569 2 17V8H18ZM18 8V5C18 4.44772 17.5523 4 17 4H3C2.44772 4 2 4.44772 2 5V8" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+        </svg>
+      </div>
+      <div class="text-sm">
+        <p class="text-white font-medium">Quality</p>
+        <p class="text-gray-400">Support</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-4 px-4">
+      <div class="text-gray-400">
+        <svg fill="none" height="24" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+        </svg>
+      </div>
+      <div class="text-sm">
+        <p class="text-white font-medium">1 Year</p>
+        <p class="text-gray-400">Warranty</p>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- END: Value Props -->
+
+<!-- BEGIN: Main Content -->
+<main class="max-w-7xl mx-auto px-4 py-16">
+
+  <section id="offers" class="mb-20 scroll-mt-24">
+    <div class="mb-7 flex flex-wrap items-end justify-between gap-4">
+      <div>
+        <p class="text-xs font-bold uppercase tracking-[.2em] text-emerald-700">ShopEase offers</p>
+        <h2 class="mt-2 text-3xl font-bold text-gray-900">Save on selected tech</h2>
+      </div>
+      <a href="electronics.html" class="text-sm font-semibold text-blue-800 hover:text-blue-600">Explore all products <span aria-hidden="true">→</span></a>
+    </div>
+    <div id="homeOffersGrid" class="grid gap-5 md:grid-cols-3"></div>
+  </section>
+
+  <!-- BEGIN: Featured Products -->
+  <section id="products" class="mb-20 scroll-mt-24">
+    <div class="flex justify-between items-center mb-8">
+      <h2 class="text-2xl font-bold text-gray-900">Featured Products</h2>
+      <a class="text-sm font-medium text-gray-600 hover:text-blue-600 flex items-center gap-2 border border-gray-300 rounded-full px-4 py-2" href="electronics.html">
+        View All Categories
+        <svg fill="none" height="16" viewbox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg">
+          <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+        </svg>
+      </a>
+    </div>
+    <form id="productSearchForm" action="electronics.html" class="mb-8 flex max-w-2xl" role="search">
+      <div class="relative min-w-0 flex-1">
+        <label class="sr-only" for="productSearch">Search products</label>
+        <input id="productSearch" name="search" type="search" autocomplete="off" placeholder="Search for laptops, phones, headphones..." class="w-full rounded-l-xl border border-gray-300 px-4 py-3 pr-12 text-gray-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200" />
+        <button id="productMic" type="button" class="absolute right-2 top-2 rounded-lg p-2 text-gray-500 transition-colors hover:bg-blue-50 hover:text-blue-600" aria-label="Search by voice" title="Search by voice">
+          <svg aria-hidden="true" fill="none" height="20" viewBox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg"><path d="M12 14a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v5a3 3 0 0 0 3 3Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/><path d="M19 11a7 7 0 0 1-14 0M12 18v4M8 22h8" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+        </button>
+        <div id="productSuggestions" class="absolute left-0 right-0 top-full z-30 mt-1 hidden overflow-hidden rounded-lg border border-gray-200 bg-white text-left shadow-lg"></div>
+      </div>
+      <button id="productCamera" type="button" class="border-y border-gray-300 px-4 text-gray-600 transition-colors hover:bg-blue-50 hover:text-blue-600" aria-label="Search by camera" title="Search by camera">
+        <svg aria-hidden="true" fill="none" height="20" viewBox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg"><path d="M4 7h3l1.5-2h7L17 7h3a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/><circle cx="12" cy="13" r="4" stroke="currentColor" stroke-width="2"/></svg>
+      </button>
+      <button type="submit" class="rounded-r-xl bg-blue-600 px-5 py-3 font-semibold text-white transition-colors hover:bg-blue-700">Search</button>
+    </form>
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
+
+      <!-- Product Card 1: Apple Laptops -->
+      <div class="featured-product-card cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1 flex flex-col overflow-hidden">
+        <div class="relative h-48 w-full overflow-hidden">
+          <span class="absolute top-4 left-4 z-10 bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded">BEST SELLER</span>
+          <img alt="Apple Laptop" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105" src="https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=500&q=80"/>
+        </div>
+        <div class="p-6 flex flex-col flex-1">
+          <p class="text-sm text-gray-500 mb-1">Computing</p>
+          <h3 class="font-bold text-lg text-gray-900 mb-2">Apple Laptops</h3>
+          <div class="flex items-center gap-1 mb-4 text-yellow-400 text-sm">
+            <span>★</span><span>★</span><span>★</span><span>★</span><span class="text-gray-300">★</span>
+            <span class="text-gray-500 text-xs ml-1">(1.5k)</span>
+          </div>
+          <div class="flex justify-between items-end mt-auto">
+            <span class="text-lg font-bold text-blue-600">₹50,000</span>
+            <button data-product="Apple Laptop" class="add-to-cart bg-indigo-600 hover:bg-indigo-700 text-white p-3 rounded-full transition-colors">
+              <svg fill="none" height="20" viewbox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3 3H5L5.4 5M7 13H17L21 5H5.4M7 13L5.4 5M7 13L4.70711 15.2929C4.07714 15.9229 4.52331 17 5.41421 17H17M17 17C15.8954 17 15 17.8954 15 19C15 20.1046 15.8954 21 17 21C18.1046 21 19 20.1046 19 19C19 17.8954 18.1046 17 17 17ZM9 19C9 20.1046 8.10457 21 7 21C5.89543 21 5 20.1046 5 19C5 17.8954 5.89543 17 7 17C8.10457 17 9 17.8954 9 19Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Product Card 2: Smartphones -->
+      <div class="featured-product-card cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1 flex flex-col overflow-hidden">
+        <div class="relative h-48 w-full overflow-hidden">
+          <span class="absolute top-4 left-4 z-10 bg-indigo-500 text-white text-xs font-bold px-2 py-1 rounded">TRENDING</span>
+          <img alt="Smartphone" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105" src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=500&q=80"/>
+        </div>
+        <div class="p-6 flex flex-col flex-1">
+          <p class="text-sm text-gray-500 mb-1">Mobiles</p>
+          <h3 class="font-bold text-lg text-gray-900 mb-2">Iphone 15</h3>
+          <div class="flex items-center gap-1 mb-4 text-yellow-400 text-sm">
+            <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+            <span class="text-gray-500 text-xs ml-1">(2.8k)</span>
+          </div>
+          <div class="flex justify-between items-end mt-auto">
+            <span class="text-lg font-bold text-blue-600">₹1,00,000</span>
+            <button data-product="Smartphone" class="add-to-cart bg-indigo-600 hover:bg-indigo-700 text-white p-3 rounded-full transition-colors">
+              <svg fill="none" height="20" viewbox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3 3H5L5.4 5M7 13H17L21 5H5.4M7 13L5.4 5M7 13L4.70711 15.2929C4.07714 15.9229 4.52331 17 5.41421 17H17M17 17C15.8954 17 15 17.8954 15 19C15 20.1046 15.8954 21 17 21C18.1046 21 19 20.1046 19 19C19 17.8954 18.1046 17 17 17ZM9 19C9 20.1046 8.10457 21 7 21C5.89543 21 5 20.1046 5 19C5 17.8954 5.89543 17 7 17C8.10457 17 9 17.8954 9 19Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Product Card 3: Wireless Headphones -->
+      <div class="featured-product-card cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1 flex flex-col overflow-hidden">
+        <div class="relative h-48 w-full overflow-hidden">
+          <span class="absolute top-4 left-4 z-10 bg-purple-600 text-white text-xs font-bold px-2 py-1 rounded">NEW ARRIVAL</span>
+          <img alt="Wireless Headphones" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105" src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&q=80"/>
+        </div>
+        <div class="p-6 flex flex-col flex-1">
+          <p class="text-sm text-gray-500 mb-1">Audio</p>
+          <h3 class="font-bold text-lg text-gray-900 mb-2">Wireless Headphones</h3>
+          <div class="flex items-center gap-1 mb-4 text-yellow-400 text-sm">
+            <span>★</span><span>★</span><span>★</span><span>★</span><span class="text-gray-300">★</span>
+            <span class="text-gray-500 text-xs ml-1">(150)</span>
+          </div>
+          <div class="flex justify-between items-end mt-auto">
+            <span class="text-lg font-bold text-blue-600">₹20,000</span>
+            <button data-product="Wireless Headphones" class="add-to-cart bg-indigo-600 hover:bg-indigo-700 text-white p-3 rounded-full transition-colors">
+              <svg fill="none" height="20" viewbox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3 3H5L5.4 5M7 13H17L21 5H5.4M7 13L5.4 5M7 13L4.70711 15.2929C4.07714 15.9229 4.52331 17 5.41421 17H17M17 17C15.8954 17 15 17.8954 15 19C15 20.1046 15.8954 21 17 21C18.1046 21 19 20.1046 19 19C19 17.8954 18.1046 17 17 17ZM9 19C9 20.1046 8.10457 21 7 21C5.89543 21 5 20.1046 5 19C5 17.8954 5.89543 17 7 17C8.10457 17 9 17.8954 9 19Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Product Card 4: Smart Watch -->
+      <div class="featured-product-card cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1 flex flex-col overflow-hidden">
+        <div class="relative h-48 w-full overflow-hidden">
+          <span class="absolute top-4 left-4 z-10 bg-emerald-600 text-white text-xs font-bold px-2 py-1 rounded">POPULAR</span>
+          <img alt="Smart Watch" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105" src="https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=500&q=80"/>
+        </div>
+        <div class="p-6 flex flex-col flex-1">
+          <p class="text-sm text-gray-500 mb-1">Wearables</p>
+          <h3 class="font-bold text-lg text-gray-900 mb-2">Smart Watch</h3>
+          <div class="flex items-center gap-1 mb-4 text-yellow-400 text-sm">
+            <span>★</span><span>★</span><span>★</span><span>★</span><span class="text-gray-300">★</span>
+            <span class="text-gray-500 text-xs ml-1">(98)</span>
+          </div>
+          <div class="flex justify-between items-end mt-auto">
+            <span class="text-lg font-bold text-blue-600">₹5,000</span>
+            <button data-product="Smart Watch" class="add-to-cart bg-indigo-600 hover:bg-indigo-700 text-white p-3 rounded-full transition-colors">
+              <svg fill="none" height="20" viewbox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3 3H5L5.4 5M7 13H17L21 5H5.4M7 13L5.4 5M7 13L4.70711 15.2929C4.07714 15.9229 4.52331 17 5.41421 17H17M17 17C15.8954 17 15 17.8954 15 19C15 20.1046 15.8954 21 17 21C18.1046 21 19 20.1046 19 19C19 17.8954 18.1046 17 17 17ZM9 19C9 20.1046 8.10457 21 7 21C5.89543 21 5 20.1046 5 19C5 17.8954 5.89543 17 7 17C8.10457 17 9 17.8954 9 19Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+  <!-- END: Featured Products -->
+
+  <!-- BEGIN: Shop By Category -->
+  <section id="categories" class="mb-20 scroll-mt-24">
+    <h2 class="text-2xl font-bold text-gray-900 mb-8">Shop By Category</h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+
+      <!-- Category Card 1 -->
+      <a href="electronics.html?category=Mobiles" class="group relative rounded-2xl overflow-hidden h-64 block">
+        <img alt="Mobiles" class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=500&q=80"/>
+        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+        <div class="absolute bottom-0 left-0 p-6 z-10">
+          <h3 class="text-xl font-bold text-white mb-1">Mobiles</h3>
+          <p class="text-sm text-gray-200 mb-3">Latest smartphones & more.</p>
+          <span class="text-white bg-blue-600 hover:bg-blue-700 font-medium inline-flex items-center text-sm gap-2 px-4 py-2 rounded-full group-hover:translate-x-1 transition-all duration-300">
+            Shop Now <span>→</span>
+          </span>
+        </div>
+      </a>
+
+      <!-- Category Card 2 -->
+      <a href="electronics.html?category=Audio" class="group relative rounded-2xl overflow-hidden h-64 block">
+        <img alt="Audio" class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&q=80"/>
+        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+        <div class="absolute bottom-0 left-0 p-6 z-10">
+          <h3 class="text-xl font-bold text-white mb-1">Audio</h3>
+          <p class="text-sm text-gray-200 mb-3">Headphones & speakers.</p>
+          <span class="text-white bg-blue-600 hover:bg-blue-700 font-medium inline-flex items-center text-sm gap-2 px-4 py-2 rounded-full group-hover:translate-x-1 transition-all duration-300">
+            Shop Now <span>→</span>
+          </span>
+        </div>
+      </a>
+
+      <!-- Category Card 3 -->
+      <a href="electronics.html?category=Computing" class="group relative rounded-2xl overflow-hidden h-64 block">
+        <img alt="Computing" class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" src="https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=500&q=80"/>
+        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+        <div class="absolute bottom-0 left-0 p-6 z-10">
+          <h3 class="text-xl font-bold text-white mb-1">Computing</h3>
+          <p class="text-sm text-gray-200 mb-3">Laptops & accessories.</p>
+          <span class="text-white bg-blue-600 hover:bg-blue-700 font-medium inline-flex items-center text-sm gap-2 px-4 py-2 rounded-full group-hover:translate-x-1 transition-all duration-300">
+            Shop Now <span>→</span>
+          </span>
+        </div>
+      </a>
+
+      <!-- Category Card 4 -->
+      <a href="electronics.html?category=Wearables" class="group relative rounded-2xl overflow-hidden h-64 block">
+        <img alt="Wearables" class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" src="https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=500&q=80"/>
+        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+        <div class="absolute bottom-0 left-0 p-6 z-10">
+          <h3 class="text-xl font-bold text-white mb-1">Wearables</h3>
+          <p class="text-sm text-gray-200 mb-3">Smart watches & bands.</p>
+          <span class="text-white bg-blue-600 hover:bg-blue-700 font-medium inline-flex items-center text-sm gap-2 px-4 py-2 rounded-full group-hover:translate-x-1 transition-all duration-300">
+            Shop Now <span>→</span>
+          </span>
+        </div>
+      </a>
+
+    </div>
+  </section>
+  <!-- END: Shop By Category -->
+
+  <!-- BEGIN: Trust Section -->
+  <section class="bg-[#1e1b4b] rounded-3xl p-10 text-white relative overflow-hidden">
+    <div class="absolute top-0 right-0 w-64 h-64 bg-blue-600 opacity-20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
+    <div class="absolute bottom-0 left-0 w-64 h-64 bg-indigo-600 opacity-20 rounded-full blur-3xl translate-y-1/2 -translate-x-1/3"></div>
+    <h2 class="text-2xl font-bold text-center mb-10 relative z-10">Why Shop With ShopEase?</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 relative z-10">
+      <div class="flex items-start gap-4">
+        <div class="bg-white/10 p-3 rounded-lg text-blue-400">
+          <svg fill="none" height="24" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M5 8H15M5 8V16H15V8H5ZM5 8L3 10M15 8L17 10M15 16H19C20.1046 16 21 15.1046 21 14V11.5M19 16C19 17.1046 18.1046 18 17 18C15.8954 18 15 17.1046 15 16M19 16H21V11.5L17 10V16M3 16C3 17.1046 3.89543 18 5 18C6.10457 18 7 17.1046 7 16M3 16H5M7 16H15" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+          </svg>
+        </div>
+        <div>
+          <h4 class="font-bold mb-1">Fast Delivery</h4>
+          <p class="text-sm text-gray-400">Reliable, same-day dispatch on every order.</p>
+        </div>
+      </div>
+      <div class="flex items-start gap-4">
+        <div class="bg-white/10 p-3 rounded-lg text-indigo-400">
+          <svg fill="none" height="24" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12ZM12 8V12L15 15" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+          </svg>
+        </div>
+        <div>
+          <h4 class="font-bold mb-1">Easy Returns</h4>
+          <p class="text-sm text-gray-400">30-day easy returns, no questions asked.</p>
+        </div>
+      </div>
+      <div class="flex items-start gap-4">
+        <div class="bg-white/10 p-3 rounded-lg text-blue-400">
+          <svg fill="none" height="24" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+          </svg>
+        </div>
+        <div>
+          <h4 class="font-bold mb-1">Secure Checkout</h4>
+          <p class="text-sm text-gray-400">Payments protected, every single time.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- END: Trust Section -->
+
+</main>
+<!-- END: Main Content -->
+
+<!-- BEGIN: Newsletter -->
+<section class="hero-gradient py-16 px-8">
+  <div class="max-w-2xl mx-auto text-center">
+    <h2 class="text-2xl md:text-3xl font-bold text-white mb-3">Stay in the loop</h2>
+    <p class="text-gray-400 mb-8">Get the latest deals and product drops straight to your inbox.</p>
+    <form id="newsletterForm" class="flex flex-col sm:flex-row gap-3 justify-center max-w-md mx-auto">
+      <input type="email" required placeholder="Enter your email" class="flex-1 px-5 py-3 rounded-full border-0 focus:ring-2 focus:ring-blue-500 outline-none text-gray-800"/>
+      <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-3 rounded-full transition-colors">Follow</button>
+    </form>
+  </div>
+</section>
+<!-- END: Newsletter -->
+
+<!-- BEGIN: Footer -->
+<footer id="contact" class="bg-[#0b1120] text-gray-400 py-8 px-8">
+  <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4 text-sm border-t border-gray-800 pt-6">
+    <p>&copy; 2026 ShopEase. All rights reserved.</p>
+    <div class="flex gap-6">
+      <a href="#home" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full font-medium transition-all duration-300 hover:translate-x-1">Home</a>
+      <a href="#products" class="hover:text-white transition-colors">Products</a>
+      <a href="#categories" class="hover:text-white transition-colors">Categories</a>
+      <a href="#contact" class="hover:text-white transition-colors">Contact</a>
+    </div>
+  </div>
+</footer>
+<!-- END: Footer -->
+
+<section id="ordersSection" class="hidden max-w-7xl mx-auto px-8 pb-12">
+  <div class="rounded-3xl border border-slate-700 bg-slate-900/80 p-8 shadow-xl">
+    <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-[0.2em] text-blue-300">Orders</p>
+        <h2 class="mt-2 text-2xl font-bold text-white">My Orders</h2>
+      </div>
+      <span id="ordersMeta" class="rounded-full bg-blue-600/20 px-3 py-1 text-sm font-medium text-blue-200">0 orders</span>
+    </div>
+    <div id="ordersList" class="mt-6 space-y-4"></div>
+  </div>
+</section>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<script>
+  const cartKey = 'shopease_cart';
+  const offerCurrency = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 });
+  const homeOffers = [
+    { name: 'Apple Laptop', category: 'Computing', originalPrice: 50000, price: 45000, image: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=600&q=80' },
+    { name: 'Wireless Headphones', category: 'Audio', originalPrice: 20000, price: 16000, image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&q=80' },
+    { name: 'Smart Watch', category: 'Wearables', originalPrice: 5000, price: 4499, image: 'https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=600&q=80' }
+  ];
+  const homeOffersGrid = document.getElementById('homeOffersGrid');
+  const cartCountEl = document.getElementById('cartCount');
+  const toastEl = document.getElementById('toast');
+  const loginLink = document.getElementById('loginLink');
+  const accountBox = document.getElementById('accountBox');
+  const accountName = document.getElementById('accountName');
+  const logoutBtn = document.getElementById('logoutBtn');
+  const ordersSection = document.getElementById('ordersSection');
+  const ordersList = document.getElementById('ordersList');
+  const ordersMeta = document.getElementById('ordersMeta');
+  let toastTimer = null;
+
+  function getCart() {
+    return JSON.parse(localStorage.getItem(cartKey) || '[]');
+  }
+
+  function saveCart(cart) {
+    localStorage.setItem(cartKey, JSON.stringify(cart));
+    cartCountEl.textContent = cart.reduce((total, item) => total + item.quantity, 0);
+  }
+
+  homeOffersGrid.innerHTML = homeOffers.map((offer, index) => {
+    const savings = offer.originalPrice - offer.price;
+    const discount = Math.round((savings / offer.originalPrice) * 100);
+    return `
+      <article data-offer-card="${index}" tabindex="0" role="link" aria-label="View ${offer.name} details" class="flex cursor-pointer overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition hover:border-blue-300 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <img src="${offer.image}" alt="${offer.name}" class="h-full min-h-44 w-28 shrink-0 object-cover sm:w-32" loading="lazy" />
+        <div class="flex min-w-0 flex-1 flex-col p-4">
+          <span class="w-fit rounded bg-emerald-100 px-2 py-1 text-xs font-bold text-emerald-800">SAVE ${discount}%</span>
+          <h3 class="mt-2 text-base font-bold text-gray-900">${offer.name}</h3>
+          <p class="mt-2 text-xs text-gray-500"><span class="line-through">${offerCurrency.format(offer.originalPrice)}</span> <span class="ml-1 text-lg font-bold text-gray-900">${offerCurrency.format(offer.price)}</span></p>
+          <p class="mt-1 text-xs font-medium text-emerald-800">You save ${offerCurrency.format(savings)}</p>
+          <button type="button" data-offer-index="${index}" class="mt-auto pt-3 text-left text-sm font-bold text-blue-800 hover:text-blue-600" aria-label="Add ${offer.name} offer to cart">Add offer to cart <span aria-hidden="true">→</span></button>
+        </div>
+      </article>`;
+  }).join('');
+
+  async function updateAuthUI() {
+    let user = null;
+    try {
+      const response = await fetch('/api/session');
+      if (!response.ok) throw new Error('Unable to verify the current session');
+      user = (await response.json()).user;
+    } catch (error) {
+      console.warn('Could not verify the current session', error);
+    }
+
+    if (user) {
+      localStorage.setItem('shopease_user_logged_in', 'true');
+      localStorage.setItem('shopease_user_email', user.email);
+      localStorage.setItem('shopease_user_name', user.name);
+    } else {
+      localStorage.removeItem('shopease_user_logged_in');
+      localStorage.removeItem('shopease_user_email');
+      localStorage.removeItem('shopease_user_name');
+    }
+
+    if (user) {
+      accountBox.classList.remove('hidden');
+      accountBox.classList.add('flex');
+      accountName.textContent = user.name.split(' ')[0] || 'My Account';
+      loginLink.classList.add('hidden');
+    } else {
+      accountBox.classList.add('hidden');
+      accountBox.classList.remove('flex');
+      loginLink.classList.remove('hidden');
+    }
+  }
+
+  async function logoutUser() {
+    const response = await fetch('/api/logout', { method: 'POST' });
+    if (!response.ok) throw new Error('Unable to log out. Please try again.');
+    localStorage.removeItem('shopease_user_logged_in');
+    localStorage.removeItem('shopease_user_email');
+    localStorage.removeItem('shopease_user_name');
+    updateAuthUI();
+    showToast('Logged out successfully');
+  }
+
+  function getStatusClass(status) {
+    const statusMap = {
+      Packed: 'bg-sky-500/15 text-sky-200 border border-sky-400/30',
+      Dispatched: 'bg-violet-500/15 text-violet-200 border border-violet-400/30',
+      'Out for Delivery': 'bg-amber-500/15 text-amber-200 border border-amber-400/30',
+      Delivered: 'bg-emerald-500/15 text-emerald-200 border border-emerald-400/30',
+      'Return Requested': 'bg-pink-500/15 text-pink-200 border border-pink-400/30',
+      'Replacement Requested': 'bg-orange-500/15 text-orange-200 border border-orange-400/30',
+      'Refund Processing': 'bg-red-500/15 text-red-200 border border-red-400/30',
+      Refunded: 'bg-rose-500/15 text-rose-200 border border-rose-400/30',
+      Returned: 'bg-cyan-500/15 text-cyan-200 border border-cyan-400/30'
+    };
+    return statusMap[status] || 'bg-slate-500/15 text-slate-200 border border-slate-400/30';
+  }
+
+  function renderOrders(orders) {
+    if (!orders.length) {
+      ordersList.innerHTML = '<div class="rounded-2xl border border-dashed border-slate-600 p-6 text-slate-300">No orders yet. Place your first order to track the shipping status here.</div>';
+      ordersMeta.textContent = '0 orders';
+      return;
+    }
+
+    ordersMeta.textContent = orders.length + ' order' + (orders.length > 1 ? 's' : '');
+    ordersList.innerHTML = orders.map(order => {
+      const itemNames = (order.items || []).map(item => item.name).join(', ') || 'ShopEase purchase';
+      const total = Number(order.total || 0);
+      const deliveryAgent = order.deliveryAgent || 'Rahul Verma';
+      return `
+        <article class="rounded-2xl border border-slate-700 bg-slate-800/80 p-5">
+          <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div>
+              <p class="text-xs uppercase tracking-[0.15em] text-slate-400">Order ${order.id}</p>
+              <h3 class="mt-2 text-lg font-semibold text-white">${itemNames}</h3>
+            </div>
+            <span class="rounded-full px-3 py-1 text-sm font-semibold ${getStatusClass(order.status)}">${order.status}</span>
+          </div>
+          <div class="mt-4 flex flex-col gap-2 text-sm text-slate-300 md:flex-row md:items-center md:justify-between">
+            <p>Items: ${(order.items || []).length}</p>
+            <p>Total: ₹${Number(total).toLocaleString('en-IN')}</p>
+            <p>Delivery agent: ${deliveryAgent}</p>
+          </div>
+          <div class="mt-4 flex justify-end">
+            <a href="order-details.html?id=${order.id}" class="rounded-full border border-blue-500/50 bg-blue-600/15 px-4 py-2 text-sm font-medium text-blue-100 hover:bg-blue-600/25">View details</a>
+          </div>
+        </article>
+      `;
+    }).join('');
+  }
+
+  async function loadOrders() {
+    const email = localStorage.getItem('shopease_user_email');
+    if (!email) {
+      ordersSection.classList.add('hidden');
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/orders?email=${encodeURIComponent(email)}`);
+      if (!response.ok) {
+        throw new Error('Unable to load orders');
+      }
+      const data = await response.json();
+      ordersSection.classList.remove('hidden');
+      renderOrders(data.orders || []);
+    } catch (error) {
+      const localOrders = JSON.parse(localStorage.getItem('shopease_orders') || '[]');
+      ordersSection.classList.remove('hidden');
+      renderOrders(localOrders);
+    }
+  }
+
+  function showToast(message) {
+    toastEl.textContent = message;
+    toastEl.classList.add('show');
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2200);
+  }
+
+  async function syncCartToBackend(cart) {
+    const response = await fetch('/api/cart', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ items: cart })
+    });
+    if (response.status === 401) return false;
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Unable to save cart to your account');
+    return true;
+  }
+
+  saveCart(getCart());
+  updateAuthUI().then(loadOrders);
+
+  logoutBtn.addEventListener('click', async () => {
+    try {
+      await logoutUser();
+      ordersSection.classList.add('hidden');
+    } catch (error) {
+      showToast(error.message);
+    }
+  });
+
+  document.getElementById('cartBtn').addEventListener('click', () => {
+    window.location.href = 'cart.html';
+  });
+
+  document.querySelectorAll('.add-to-cart').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const card = btn.closest('.rounded-2xl');
+      const name = btn.getAttribute('data-product');
+      const priceText = card.querySelector('.text-blue-600').textContent.replace(/[^0-9.]/g, '');
+      const image = card.querySelector('img').src;
+      const cart = getCart();
+      const existingItem = cart.find(item => item.name === name);
+
+      if (existingItem) {
+        existingItem.quantity += 1;
+      } else {
+        cart.push({ name, price: Number(priceText), image, quantity: 1 });
+      }
+
+      saveCart(cart);
+      try {
+        const synced = await syncCartToBackend(cart);
+        showToast(synced
+          ? `${name} added to your cart`
+          : 'Added on this device. Sign in to save your cart.');
+      } catch (error) {
+        console.warn('Could not sync cart to backend', error);
+        showToast('Added on this device, but could not save to your account.');
+      }
+    });
+  });
+
+  const featuredProducts = [
+    { name: 'Apple Laptops', category: 'Computing', price: 50000, image: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=600&q=80' },
+    { name: 'Iphone 15', category: 'Mobiles', price: 100000, image: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=600&q=80' },
+    { name: 'Wireless Headphones', category: 'Audio', price: 20000, image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&q=80' },
+    { name: 'Smart Watch', category: 'Wearables', price: 5000, image: 'https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=600&q=80' }
+  ];
+  document.querySelectorAll('.featured-product-card').forEach((card, index) => {
+    card.tabIndex = 0;
+    card.setAttribute('role', 'link');
+    card.setAttribute('aria-label', `View ${featuredProducts[index].name} details`);
+    const openDetails = () => {
+      const product = featuredProducts[index];
+      localStorage.setItem('shopease_selected_product', JSON.stringify(product));
+      window.location.href = `product.html?name=${encodeURIComponent(product.name)}&category=${encodeURIComponent(product.category)}`;
+    };
+    card.addEventListener('click', event => {
+      if (event.target.closest('.add-to-cart')) return;
+      openDetails();
+    });
+    card.addEventListener('keydown', event => {
+      if (event.target !== card || !['Enter', ' '].includes(event.key)) return;
+      event.preventDefault();
+      openDetails();
+    });
+  });
+
+  homeOffersGrid.addEventListener('click', async event => {
+    const button = event.target.closest('[data-offer-index]');
+    if (!button) {
+      const card = event.target.closest('[data-offer-card]');
+      if (!card) return;
+      const selectedOffer = homeOffers[Number(card.dataset.offerCard)];
+      if (!selectedOffer) return;
+      localStorage.setItem('shopease_selected_product', JSON.stringify(selectedOffer));
+      window.location.href = `product.html?name=${encodeURIComponent(selectedOffer.name)}&category=${encodeURIComponent(selectedOffer.category)}`;
+      return;
+    }
+    const offer = homeOffers[Number(button.dataset.offerIndex)];
+    if (!offer) return;
+    const cart = getCart();
+    const existingItem = cart.find(item => item.name === offer.name);
+    if (existingItem) {
+      existingItem.price = offer.price;
+      existingItem.quantity += 1;
+    } else {
+      cart.push({ name: offer.name, category: offer.category, price: offer.price, image: offer.image, quantity: 1 });
+    }
+    saveCart(cart);
+    try {
+      const synced = await syncCartToBackend(cart);
+      showToast(synced
+        ? `${offer.name} offer added to your cart`
+        : 'Added on this device. Sign in to save your cart.');
+    } catch (error) {
+      console.warn('Could not sync cart to backend', error);
+      showToast('Added on this device, but could not save to your account.');
+    }
+  });
+
+  homeOffersGrid.addEventListener('keydown', event => {
+    const card = event.target.closest('[data-offer-card]');
+    if (!card || event.target !== card || !['Enter', ' '].includes(event.key)) return;
+    event.preventDefault();
+    card.click();
+  });
+
+  document.getElementById('newsletterForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    showToast('Subscribed! Thanks for following ShopEase.');
+    e.target.reset();
+  });
+
+  document.getElementById('productSearchForm').addEventListener('submit', (e) => {
+    const query = document.getElementById('productSearch').value.trim();
+    if (!query) e.preventDefault();
+  });
+
+  const productSearch = document.getElementById('productSearch');
+  const productSuggestions = document.getElementById('productSuggestions');
+  const productNames = ['Apple Laptops', 'Iphone 15', 'Wireless Headphones', 'Smart Watch', 'Smartphone'];
+
+  productSearch.addEventListener('input', () => {
+    const query = productSearch.value.trim().toLowerCase();
+    const matches = query ? productNames.filter(name => name.toLowerCase().includes(query)) : [];
+    productSuggestions.innerHTML = matches.map(name => `<button type="button" class="block w-full px-4 py-3 text-left text-sm text-gray-700 hover:bg-blue-50">${name}</button>`).join('');
+    productSuggestions.classList.toggle('hidden', matches.length === 0);
+  });
+
+  productSuggestions.addEventListener('click', event => {
+    productSearch.value = event.target.textContent;
+    productSuggestions.classList.add('hidden');
+    productSearch.focus();
+  });
+
+  setupVoiceSearch(productSearch, document.getElementById('productMic'), () => {
+    productSuggestions.classList.add('hidden');
+    document.getElementById('productSearchForm').requestSubmit();
+  });
+  document.getElementById('productCamera').addEventListener('click', () => {
+    window.location.href = 'electronics.html?scan=1';
+  });
+
+  function setupVoiceSearch(input, micButton, onResult) {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      micButton.disabled = true;
+      micButton.classList.add('cursor-not-allowed', 'opacity-40');
+      micButton.title = 'Voice search is not supported in this browser';
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'en-US';
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+    recognition.addEventListener('start', () => micButton.classList.add('text-red-500', 'animate-pulse'));
+    recognition.addEventListener('end', () => micButton.classList.remove('text-red-500', 'animate-pulse'));
+    recognition.addEventListener('result', event => {
+      input.value = event.results[0][0].transcript;
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      onResult();
+    });
+    recognition.addEventListener('error', () => micButton.classList.remove('text-red-500', 'animate-pulse'));
+    micButton.addEventListener('click', () => recognition.start());
+  }
+</script>
+
+</body>
+</html>

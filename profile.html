@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Your Profile - ShopEase</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script src="address-selector.js" defer></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
+    body { font-family: 'DM Sans', sans-serif; background: #f4f7fb; }
+    h1, h2, h3 { font-family: 'Space Grotesk', sans-serif; }
+    .page-glow { background: radial-gradient(circle at 80% 0%, rgba(37, 99, 235, .16), transparent 32%), linear-gradient(135deg, #0b1120 0%, #172554 100%); }
+  </style>
+</head>
+<body class="min-h-screen text-slate-800">
+  <nav class="sticky top-0 z-50 page-glow text-white">
+    <div class="mx-auto flex max-w-7xl items-center justify-between px-5 py-5 lg:px-8">
+      <a href="index.html" class="flex items-center gap-3 text-lg font-bold tracking-[.2em]"><span class="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-500 text-sm tracking-normal">S</span>SHOPEASE</a>
+      <div class="flex items-center gap-2 text-sm sm:gap-3">
+        <a href="index.html" class="rounded-full px-3 py-2 text-slate-300 transition hover:bg-white/10 hover:text-white sm:px-4">Shop</a>
+        <a href="orders.html" class="rounded-full px-3 py-2 text-slate-300 transition hover:bg-white/10 hover:text-white sm:px-4">Orders</a>
+        <a href="cart.html" class="rounded-full border border-white/20 px-3 py-2 transition hover:border-blue-300 hover:bg-white/10 sm:px-4">Cart</a>
+      </div>
+    </div>
+  </nav>
+  <header class="page-glow text-white">
+    <div class="mx-auto max-w-7xl px-5 pb-10 pt-7 lg:px-8">
+      <p class="text-xs font-semibold uppercase tracking-[.28em] text-blue-200">Account</p>
+      <h1 class="mt-3 text-4xl font-bold tracking-tight">Your Profile</h1>
+      <p id="profileEmail" class="mt-2 text-sm text-slate-300">Manage your contact details and delivery addresses.</p>
+    </div>
+  </header>
+
+  <main class="mx-auto max-w-5xl px-5 py-7 lg:px-8">
+    <nav class="mb-6 flex gap-2 border-b border-slate-200" aria-label="Profile sections">
+      <button type="button" data-profile-tab="details" aria-selected="true" class="profile-tab border-b-2 border-blue-700 px-4 py-3 text-sm font-semibold text-blue-800">Personal details</button>
+      <button type="button" data-profile-tab="wishlist" aria-selected="false" class="profile-tab border-b-2 border-transparent px-4 py-3 text-sm font-semibold text-slate-500 hover:text-slate-900">Wishlist <span id="wishlistCount" class="ml-1 text-xs">0</span></button>
+    </nav>
+    <section id="profilePanel" class="mb-8">
+      <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <h2 class="text-3xl font-bold text-slate-900">Your Addresses</h2>
+        <button id="profileEditButton" type="button" class="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">Edit personal details</button>
+      </div>
+      <button id="addAddressFromSummary" type="button" class="flex w-full items-center justify-between border-y border-slate-200 bg-white px-4 py-4 text-left text-base font-medium text-slate-900 transition hover:bg-slate-50 sm:px-5">
+        <span>Add a new address</span><span aria-hidden="true" class="text-2xl leading-none">›</span>
+      </button>
+      <div id="profileSummary" class="mt-5">
+        <div class="mb-3 flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
+          <h3 class="text-xl font-bold text-slate-900">Personal Addresses</h3>
+          <label class="relative block sm:w-80">
+            <span class="sr-only">Search saved addresses</span>
+            <span aria-hidden="true" class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-lg text-slate-500">⌕</span>
+            <input id="savedAddressSearch" type="search" placeholder="Search for address" class="w-full rounded-lg border-slate-300 bg-white py-3 pl-10 pr-3 text-sm focus:border-blue-500 focus:ring-blue-500" />
+          </label>
+        </div>
+        <div id="savedAddressList" class="grid gap-3 sm:grid-cols-2"></div>
+      </div>
+      <form id="profileForm" hidden class="hidden mt-4 grid gap-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:grid-cols-2 lg:grid-cols-4">
+        <div>
+          <label for="profileName" class="mb-1.5 block text-sm font-medium text-slate-700">Full name</label>
+          <input id="profileName" autocomplete="name" required class="w-full rounded-lg border-slate-300 text-sm focus:border-blue-500 focus:ring-blue-500" />
+        </div>
+        <div>
+          <label for="profilePhone" class="mb-1.5 block text-sm font-medium text-slate-700">Phone number</label>
+          <input id="profilePhone" type="tel" autocomplete="tel" class="w-full rounded-lg border-slate-300 text-sm focus:border-blue-500 focus:ring-blue-500" />
+        </div>
+        <div>
+          <label for="profileAlternatePhone" class="mb-1.5 block text-sm font-medium text-slate-700">Alternative phone</label>
+          <input id="profileAlternatePhone" type="tel" autocomplete="tel" class="w-full rounded-lg border-slate-300 text-sm focus:border-blue-500 focus:ring-blue-500" />
+        </div>
+        <div class="sm:col-span-2 lg:col-span-4">
+          <div class="mb-2 flex items-center justify-between gap-3">
+            <label class="block text-sm font-medium text-slate-700" for="profileAddress0">Saved addresses</label>
+            <button id="addAddressButton" type="button" aria-label="Add another address" title="Add another address" class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-slate-300 bg-white text-xl font-medium text-slate-700 transition hover:border-blue-500 hover:bg-blue-50 hover:text-blue-700">+</button>
+          </div>
+          <div id="addressList" class="grid gap-3"></div>
+        </div>
+        <div class="flex flex-wrap items-center gap-3 sm:col-span-2 lg:col-span-4">
+          <button type="submit" class="rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700">Save details</button>
+          <button id="cancelProfileEdit" type="button" class="rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">Cancel</button>
+        </div>
+      </form>
+      <p id="profileMessage" class="mt-3 text-sm text-slate-500" role="status" aria-live="polite"></p>
+    </section>
+    <section id="wishlistPanel" class="hidden" aria-labelledby="wishlistHeading">
+      <div class="mb-5 flex flex-wrap items-end justify-between gap-3">
+        <div><h2 id="wishlistHeading" class="text-3xl font-bold text-slate-900">Your Wishlist</h2><p class="mt-1 text-sm text-slate-500">Products you’ve saved to come back to.</p></div>
+        <a href="electronics.html" class="rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700">Browse products</a>
+      </div>
+      <div id="wishlistProducts" class="grid gap-4 sm:grid-cols-2"></div>
+    </section>
+  </main>
+
+  <script>
+    const profileForm = document.getElementById('profileForm');
+    const profileMessage = document.getElementById('profileMessage');
+    const addressList = document.getElementById('addressList');
+    const profileSummary = document.getElementById('profileSummary');
+    const profileEditButton = document.getElementById('profileEditButton');
+    const wishlistProducts = document.getElementById('wishlistProducts');
+    const wishlistKey = 'shopease_wishlist';
+    const cartKey = 'shopease_cart';
+    let profileData = { name: '', phone: '', alternatePhone: '', addresses: [] };
+
+    function escapeHTML(value) {
+      return String(value || '').replace(/[&<>"']/g, character => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      })[character]);
+    }
+    function getWishlist() {
+      try { return JSON.parse(localStorage.getItem(wishlistKey) || '[]'); }
+      catch { return []; }
+    }
+    function renderWishlist() {
+      const wishlist = getWishlist();
+      document.getElementById('wishlistCount').textContent = wishlist.length;
+      wishlistProducts.innerHTML = wishlist.length
+        ? wishlist.map((item, index) => `
+          <article class="grid grid-cols-[96px_minmax(0,1fr)] gap-4 rounded-xl border border-slate-200 bg-white p-4 sm:grid-cols-[120px_minmax(0,1fr)] sm:p-5">
+            <button type="button" data-view-wishlist="${index}" class="product-image flex aspect-square items-center justify-center overflow-hidden rounded-lg bg-slate-100" aria-label="View ${escapeHTML(item.name)} details">
+              <img src="${escapeHTML(item.image)}" alt="" class="h-full w-full object-cover" loading="lazy" />
+            </button>
+            <div class="flex min-w-0 flex-col items-start">
+              <p class="text-xs font-semibold uppercase tracking-wide text-emerald-700">${escapeHTML(item.category || 'Product')}</p>
+              <h3 class="mt-1 break-words text-lg font-bold text-slate-900">${escapeHTML(item.name)}</h3>
+              <p class="mt-2 text-base font-bold text-slate-900">${new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(Number(item.price || 0))}</p>
+              <div class="mt-auto flex flex-wrap gap-2 pt-4">
+                <button type="button" data-cart-wishlist="${index}" class="rounded-lg bg-amber-400 px-3 py-2 text-xs font-bold text-slate-950 transition hover:bg-amber-300">Add to Cart</button>
+                <button type="button" data-remove-wishlist="${index}" class="rounded-lg border border-slate-300 px-3 py-2 text-xs font-semibold text-slate-700 transition hover:border-red-300 hover:bg-red-50 hover:text-red-700">Remove</button>
+              </div>
+            </div>
+          </article>`).join('')
+        : '<div class="rounded-xl border border-dashed border-slate-300 bg-white px-5 py-12 text-center sm:col-span-2"><p class="text-lg font-semibold text-slate-800">Your wishlist is empty</p><p class="mt-1 text-sm text-slate-500">Save products from their detail page and they’ll appear here.</p><a href="electronics.html" class="mt-4 inline-flex rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white">Explore electronics</a></div>';
+    }
+    async function loadAccountWishlist() {
+      const email = localStorage.getItem('shopease_user_email');
+      if (!email) return;
+      try {
+        const response = await fetch(`/api/wishlist?email=${encodeURIComponent(email)}`);
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Unable to load wishlist');
+        localStorage.setItem(wishlistKey, JSON.stringify(data.items || []));
+        renderWishlist();
+      } catch (error) {
+        profileMessage.textContent = error.message || 'Unable to load your wishlist.';
+      }
+    }
+    async function saveAccountWishlist(items) {
+      const email = localStorage.getItem('shopease_user_email');
+      if (!email) return;
+      const response = await fetch('/api/wishlist', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, items })
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Unable to save wishlist');
+    }
+    function openWishlistProduct(index) {
+      const product = getWishlist()[index];
+      if (!product) return;
+      localStorage.setItem('shopease_selected_product', JSON.stringify(product));
+      window.location.href = `product.html?name=${encodeURIComponent(product.name)}&category=${encodeURIComponent(product.category || '')}`;
+    }
+    function showProfileTab(tab) {
+      const showingWishlist = tab === 'wishlist';
+      document.getElementById('profilePanel').classList.toggle('hidden', showingWishlist);
+      document.getElementById('wishlistPanel').classList.toggle('hidden', !showingWishlist);
+      document.querySelectorAll('[data-profile-tab]').forEach(button => {
+        const active = button.dataset.profileTab === tab;
+        button.setAttribute('aria-selected', String(active));
+        button.classList.toggle('border-blue-700', active);
+        button.classList.toggle('text-blue-800', active);
+        button.classList.toggle('border-transparent', !active);
+        button.classList.toggle('text-slate-500', !active);
+      });
+      if (showingWishlist) renderWishlist();
+    }
+    function renderSavedProfile(profile) {
+      profileData = {
+        name: profile.name || '',
+        phone: profile.phone || '',
+        alternatePhone: profile.alternatePhone || '',
+        addresses: profile.addresses?.length ? profile.addresses : (profile.address ? [profile.address] : [])
+      };
+      const savedAddressList = document.getElementById('savedAddressList');
+      savedAddressList.innerHTML = profileData.addresses.length
+        ? profileData.addresses.map((address, index) => `
+          <article data-saved-address class="rounded-xl border border-slate-200 bg-white p-4 sm:p-5">
+            <div class="mb-3 flex items-center justify-between gap-2 border-b border-slate-200 pb-2">
+              <p class="text-xs font-medium text-slate-500">${index === 0 ? 'Default address' : 'Saved address'}</p>
+              ${index === 0 ? '<span class="rounded bg-slate-100 px-2 py-1 text-xs font-bold text-slate-700">Default</span>' : ''}
+            </div>
+            <p class="font-bold text-slate-900">${escapeHTML(profileData.name) || 'Name not added'}</p>
+            <p class="mt-1 whitespace-pre-line break-words text-sm leading-6 text-slate-700">${escapeHTML(address)}</p>
+            <p class="mt-2 text-sm text-slate-700">Phone number: ${escapeHTML(profileData.phone) || 'Not added'}</p>
+            ${profileData.alternatePhone ? `<p class="mt-1 text-sm text-slate-700">Alternative phone: ${escapeHTML(profileData.alternatePhone)}</p>` : ''}
+            <div class="mt-4 flex gap-2">
+              <button type="button" data-edit-saved-address="${index}" class="rounded-full border border-slate-400 px-4 py-2 text-sm font-medium text-slate-800 transition hover:bg-slate-50">Edit</button>
+              <button type="button" data-remove-saved-address="${index}" class="rounded-full border border-slate-400 px-4 py-2 text-sm font-medium text-slate-800 transition hover:border-red-300 hover:bg-red-50 hover:text-red-700">Remove</button>
+            </div>
+          </article>`).join('')
+        : '<p class="rounded-xl border border-dashed border-slate-300 px-4 py-8 text-center text-sm text-slate-500 sm:col-span-2">No saved addresses yet.</p>';
+      savedAddressList.querySelectorAll('[data-saved-address]').forEach(card => {
+        card.dataset.searchText = `${profileData.name} ${profileData.phone} ${profileData.alternatePhone} ${card.textContent}`.toLocaleLowerCase();
+      });
+      filterSavedAddresses();
+    }
+    function filterSavedAddresses() {
+      const query = document.getElementById('savedAddressSearch').value.trim().toLocaleLowerCase();
+      document.querySelectorAll('#savedAddressList [data-saved-address]').forEach(card => {
+        card.hidden = !card.dataset.searchText.includes(query);
+        card.classList.toggle('hidden', card.hidden);
+      });
+    }
+    function setProfileEditMode(editing) {
+      profileForm.hidden = !editing;
+      profileForm.classList.toggle('hidden', !editing);
+      profileSummary.hidden = editing;
+      profileSummary.classList.toggle('hidden', editing);
+      profileEditButton.hidden = editing;
+      profileEditButton.classList.toggle('hidden', editing);
+      const addButton = document.getElementById('addAddressFromSummary');
+      addButton.hidden = editing;
+      addButton.classList.toggle('hidden', editing);
+    }
+    function renderAddresses(addresses) {
+      addressList.innerHTML = addresses.map((address, index) => `
+        <div class="grid gap-3 rounded-lg border border-slate-200 bg-slate-50/70 p-3 sm:grid-cols-[1fr_auto] sm:items-end">
+          <div>
+            <label for="profileAddress${index}" class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">Address ${index + 1}</label>
+            <textarea id="profileAddress${index}" rows="3" autocomplete="street-address" placeholder="Enter delivery address" class="address-input w-full rounded-lg border-slate-300 bg-white text-sm focus:border-blue-500 focus:ring-blue-500">${escapeHTML(address)}</textarea>
+          </div>
+          ${addresses.length > 1 ? `<button type="button" data-remove-address="${index}" aria-label="Remove address ${index + 1}" class="flex h-10 w-10 items-center justify-center rounded-lg border border-slate-300 bg-white text-lg text-slate-600 hover:border-red-300 hover:bg-red-50 hover:text-red-700">−</button>` : ''}
+        </div>`).join('');
+    }
+    function startProfileEdit(addAddress = false, addressIndex = null) {
+      document.getElementById('profileName').value = profileData.name;
+      document.getElementById('profilePhone').value = profileData.phone;
+      document.getElementById('profileAlternatePhone').value = profileData.alternatePhone;
+      renderAddresses(profileData.addresses);
+      setProfileEditMode(true);
+      profileMessage.textContent = '';
+      if (addAddress) {
+        renderAddresses([...profileData.addresses, '']);
+        addressList.lastElementChild?.querySelector('textarea')?.focus();
+      } else if (addressIndex !== null) {
+        document.getElementById(`profileAddress${addressIndex}`)?.focus();
+      }
+    }
+    async function saveProfile(addresses, details) {
+      const email = localStorage.getItem('shopease_user_email');
+      if (!email) throw new Error('Sign in to save your details.');
+      const response = await fetch('/api/profile', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, ...details, addresses })
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Unable to save profile');
+      localStorage.setItem('shopease_user_name', data.profile.name);
+      renderSavedProfile(data.profile);
+      return data.profile;
+    }
+    function currentDetails() {
+      return {
+        name: document.getElementById('profileName').value.trim(),
+        phone: document.getElementById('profilePhone').value.trim(),
+        alternatePhone: document.getElementById('profileAlternatePhone').value.trim()
+      };
+    }
+    async function loadProfile() {
+      const email = localStorage.getItem('shopease_user_email');
+      if (!email) {
+        profileMessage.textContent = 'Sign in to manage your saved details.';
+        profileEditButton.disabled = true;
+        document.getElementById('addAddressFromSummary').disabled = true;
+        return;
+      }
+      document.getElementById('profileEmail').textContent = email;
+      try {
+        const response = await fetch(`/api/profile?email=${encodeURIComponent(email)}`);
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Unable to load profile');
+        renderSavedProfile(data.profile);
+      } catch (error) {
+        profileMessage.textContent = error.message || 'Unable to load saved details.';
+      }
+    }
+
+    profileEditButton.addEventListener('click', () => startProfileEdit());
+    document.getElementById('addAddressFromSummary').addEventListener('click', () => startProfileEdit(true));
+    document.getElementById('savedAddressSearch').addEventListener('input', filterSavedAddresses);
+    document.getElementById('cancelProfileEdit').addEventListener('click', () => {
+      renderSavedProfile(profileData);
+      setProfileEditMode(false);
+      profileMessage.textContent = '';
+    });
+    document.getElementById('addAddressButton').addEventListener('click', () => {
+      const addresses = [...addressList.querySelectorAll('.address-input')].map(input => input.value);
+      renderAddresses([...addresses, '']);
+      addressList.lastElementChild?.querySelector('textarea')?.focus();
+    });
+    profileForm.addEventListener('submit', async event => {
+      event.preventDefault();
+      const addresses = [...addressList.querySelectorAll('.address-input')].map(input => input.value.trim()).filter(Boolean);
+      profileMessage.textContent = 'Saving...';
+      try {
+        await saveProfile(addresses, currentDetails());
+        setProfileEditMode(false);
+        profileMessage.textContent = 'Profile details saved.';
+      } catch (error) {
+        profileMessage.textContent = error.message || 'Unable to save profile.';
+      }
+    });
+    addressList.addEventListener('click', event => {
+      const removeButton = event.target.closest('[data-remove-address]');
+      if (!removeButton) return;
+      const addresses = [...addressList.querySelectorAll('.address-input')].map(input => input.value);
+      addresses.splice(Number(removeButton.dataset.removeAddress), 1);
+      renderAddresses(addresses);
+    });
+    document.getElementById('savedAddressList').addEventListener('click', async event => {
+      const editButton = event.target.closest('[data-edit-saved-address]');
+      const removeButton = event.target.closest('[data-remove-saved-address]');
+      if (editButton) {
+        startProfileEdit(false, Number(editButton.dataset.editSavedAddress));
+        return;
+      }
+      if (!removeButton || !window.confirm('Remove this saved address?')) return;
+      const addresses = [...profileData.addresses];
+      addresses.splice(Number(removeButton.dataset.removeSavedAddress), 1);
+      profileMessage.textContent = 'Removing address...';
+      try {
+        await saveProfile(addresses, profileData);
+        profileMessage.textContent = 'Address removed.';
+      } catch (error) {
+        profileMessage.textContent = error.message || 'Unable to remove address.';
+      }
+    });
+    document.querySelectorAll('[data-profile-tab]').forEach(button => {
+      button.addEventListener('click', () => showProfileTab(button.dataset.profileTab));
+    });
+    wishlistProducts.addEventListener('click', async event => {
+      const viewButton = event.target.closest('[data-view-wishlist]');
+      const cartButton = event.target.closest('[data-cart-wishlist]');
+      const removeButton = event.target.closest('[data-remove-wishlist]');
+      const index = Number((viewButton || cartButton || removeButton)?.dataset.viewWishlist
+        ?? (cartButton || removeButton)?.dataset.cartWishlist
+        ?? removeButton?.dataset.removeWishlist);
+      const wishlist = getWishlist();
+      const item = wishlist[index];
+      if (!item) return;
+      if (viewButton) {
+        openWishlistProduct(index);
+        return;
+      }
+      if (cartButton) {
+        let cart = [];
+        try { cart = JSON.parse(localStorage.getItem(cartKey) || '[]'); } catch { cart = []; }
+        const existing = cart.find(cartItem => cartItem.name === item.name);
+        if (existing) existing.quantity = Number(existing.quantity || 0) + 1;
+        else cart.push({ ...item, quantity: 1 });
+        localStorage.setItem(cartKey, JSON.stringify(cart));
+        profileMessage.textContent = `${item.name} added to cart.`;
+        return;
+      }
+      if (removeButton) {
+        wishlist.splice(index, 1);
+        localStorage.setItem(wishlistKey, JSON.stringify(wishlist));
+        renderWishlist();
+        try {
+          await saveAccountWishlist(wishlist);
+        } catch (error) {
+          profileMessage.textContent = error.message || 'Unable to sync your wishlist.';
+        }
+      }
+    });
+    window.addEventListener('storage', event => {
+      if (event.key === wishlistKey) renderWishlist();
+    });
+    window.addEventListener('pageshow', renderWishlist);
+    renderWishlist();
+    loadAccountWishlist();
+    loadProfile();
+  </script>
+</body>
+</html>
