@@ -33,15 +33,27 @@ app.config.update(
     SESSION_COOKIE_SAMESITE='Lax',
     SESSION_COOKIE_SECURE=os.environ.get('FLASK_SESSION_COOKIE_SECURE') == '1',
 )
-MONGODB_URI = os.environ.get('MONGODB_URI', 'mongodb://localhost:27017').strip()
+raw_mongo_uri = (
+    os.environ.get('MONGODB_URI')
+    or os.environ.get('MONGO_URL')
+    or os.environ.get('MONGO_PRIVATE_URL')
+    or os.environ.get('MONGODB_URL')
+    or 'mongodb://localhost:27017'
+)
+MONGODB_URI = raw_mongo_uri.strip()
 MONGODB_DATABASE = os.environ.get('MONGODB_DATABASE', 'shopease')
 if os.environ.get('MONGO_MOCK_FOR_TESTS') == '1':
     import mongomock
 
     mongo_client = mongomock.MongoClient()
+    database = mongo_client[MONGODB_DATABASE]
 else:
     mongo_client = MongoClient(MONGODB_URI, serverSelectionTimeoutMS=5000)
-database = mongo_client[MONGODB_DATABASE]
+    try:
+        default_db = mongo_client.get_default_database()
+        database = default_db if default_db is not None else mongo_client[MONGODB_DATABASE]
+    except Exception:
+        database = mongo_client[MONGODB_DATABASE]
 
 
 @app.after_request
@@ -103,15 +115,18 @@ PRODUCT_CATALOG: dict[str, tuple[str, tuple[int, ...]]] = {
 
 
 def init_mongodb() -> None:
-    database.users.create_index('email', unique=True)
-    database.password_reset_otps.create_index('email', unique=True)
-    database.cart_items.create_index([('email', 1), ('name', 1)], unique=True)
-    database.orders.create_index('id', unique=True)
-    database.orders.create_index([('email', 1), ('createdAt', -1)])
-    database.payment_attempts.create_index('razorpayOrderId', unique=True)
-    database.payment_attempts.create_index('razorpayPaymentId', unique=True, sparse=True)
-    database.wishlist_items.create_index([('email', 1), ('productName', 1)], unique=True)
-    database.product_ratings.create_index([('email', 1), ('productName', 1)], unique=True)
+    try:
+        database.users.create_index('email', unique=True)
+        database.password_reset_otps.create_index('email', unique=True)
+        database.cart_items.create_index([('email', 1), ('name', 1)], unique=True)
+        database.orders.create_index('id', unique=True)
+        database.orders.create_index([('email', 1), ('createdAt', -1)])
+        database.payment_attempts.create_index('razorpayOrderId', unique=True)
+        database.payment_attempts.create_index('razorpayPaymentId', unique=True, sparse=True)
+        database.wishlist_items.create_index([('email', 1), ('productName', 1)], unique=True)
+        database.product_ratings.create_index([('email', 1), ('productName', 1)], unique=True)
+    except Exception as exc:
+        logger.warning('MongoDB index initialization skipped or failed: %s', exc)
 
 
 def hash_password(password: str) -> str:
@@ -271,7 +286,16 @@ def homepage():
 
 @app.get('/<path:filename>')
 def frontend_file(filename):
-    return send_from_directory(os.path.dirname(os.path.abspath(__file__)), filename)
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    target_path = os.path.abspath(os.path.join(base_dir, filename))
+    if not target_path.startswith(base_dir):
+        return jsonify({'error': 'Not found'}), 404
+    blocked_exts = {'.py', '.db', '.sqlite', '.sqlite3', '.env', '.log', '.ps1'}
+    _, ext = os.path.splitext(filename.lower())
+    clean_name = os.path.basename(filename).lower()
+    if ext in blocked_exts or clean_name.startswith('.') or 'requirements' in clean_name:
+        return jsonify({'error': 'Forbidden'}), 403
+    return send_from_directory(base_dir, filename)
 
 
 def normalize_user_payload(data: dict[str, Any]) -> dict[str, Any]:
