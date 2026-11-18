@@ -249,6 +249,28 @@ def generate_otp() -> str:
 
 
 def send_email(to: str, subject: str, html: str, text: str) -> None:
+    resend_api_key = configured_environment_value('RESEND_API_KEY')
+    if resend_api_key:
+        sender_from = configured_environment_value('RESEND_FROM') or configured_environment_value('SMTP_FROM') or 'ShopEase <onboarding@resend.dev>'
+        res = requests.post(
+            'https://api.resend.com/emails',
+            headers={
+                'Authorization': f'Bearer {resend_api_key}',
+                'Content-Type': 'application/json',
+            },
+            json={
+                'from': sender_from,
+                'to': [to],
+                'subject': subject,
+                'html': html,
+                'text': text,
+            },
+            timeout=10,
+        )
+        if not res.ok:
+            raise RuntimeError(f'Resend email delivery failed: {res.status_code} {res.text}')
+        return
+
     host = os.environ.get('SMTP_HOST')
     username = os.environ.get('SMTP_USERNAME')
     password = os.environ.get('SMTP_PASSWORD')
@@ -294,6 +316,8 @@ def send_password_reset_email(email: str, otp: str) -> None:
 
 
 def smtp_is_configured() -> bool:
+    if configured_environment_value('RESEND_API_KEY'):
+        return True
     return all(
         configured_environment_value(key)
         for key in ('SMTP_HOST', 'SMTP_USERNAME', 'SMTP_PASSWORD')
@@ -359,8 +383,8 @@ def request_otp(email: str, purpose: str, sender: Any) -> tuple[bool, str | None
     otp = generate_otp()
     try:
         sender(email, otp)
-    except (OSError, smtplib.SMTPException, RuntimeError, ValueError):
-        logger.warning('Could not send ShopEase OTP email')
+    except (OSError, smtplib.SMTPException, RuntimeError, ValueError) as exc:
+        logger.warning('Could not send ShopEase OTP email: %s', exc)
         return False, 'Unable to send a verification email right now. Check the email settings and try again.'
     store_otp(email, purpose, otp, now)
     record_otp_request(email, now)
