@@ -1,3 +1,4 @@
+import logging
 from uuid import uuid4
 
 import app as backend
@@ -107,6 +108,86 @@ def test_password_reset_rejects_expired_code(monkeypatch):
         'newPassword': 'new-password'
     })
     assert response.status_code == 400
+
+
+def test_password_reset_returns_json_and_logs_database_errors(monkeypatch, caplog):
+    monkeypatch.setenv('SMTP_HOST', 'smtp.example.com')
+    monkeypatch.setenv('SMTP_USERNAME', 'shop@example.com')
+    monkeypatch.setenv('SMTP_PASSWORD', 'smtp-password')
+
+    def fail_lookup(*args, **kwargs):
+        raise RuntimeError('simulated database outage')
+
+    monkeypatch.setattr(backend.database.users, 'find_one', fail_lookup)
+    caplog.set_level(logging.ERROR, logger='app')
+
+    response = app.test_client().post(
+        '/api/forgot-password',
+        json={'email': 'customer@example.com'},
+    )
+
+    assert response.status_code == 500
+    assert response.is_json
+    assert response.get_json() == {
+        'error': 'Unable to process password reset request right now.'
+    }
+    assert any(
+        record.getMessage() == 'Unhandled error while processing password reset request'
+        and record.exc_info
+        for record in caplog.records
+    )
+
+
+def test_password_reset_unknown_email_returns_generic_json_without_sending(monkeypatch):
+    monkeypatch.setenv('SMTP_HOST', 'smtp.example.com')
+    monkeypatch.setenv('SMTP_USERNAME', 'shop@example.com')
+    monkeypatch.setenv('SMTP_PASSWORD', 'smtp-password')
+    sent_emails = []
+    monkeypatch.setattr(
+        backend,
+        'send_password_reset_email',
+        lambda email, otp: sent_emails.append((email, otp)),
+    )
+    email = f'missing-{uuid4().hex}@example.com'
+
+    response = app.test_client().post('/api/forgot-password', json={'email': email})
+
+    assert response.status_code == 200
+    assert response.is_json
+    assert response.get_json() == {
+        'message': 'If this email is valid, an OTP has been sent'
+    }
+    assert sent_emails == []
+    assert backend.database.password_reset_otps.find_one({
+        'email': email,
+        'purpose': 'reset',
+    }) is None
+
+
+def test_password_reset_email_connection_error_returns_json_and_logs(monkeypatch, caplog):
+    monkeypatch.setenv('SMTP_HOST', 'smtp.example.com')
+    monkeypatch.setenv('SMTP_USERNAME', 'shop@example.com')
+    monkeypatch.setenv('SMTP_PASSWORD', 'smtp-password')
+    email = f'mail-error-{uuid4().hex}@example.com'
+    backend.database.users.insert_one({'email': email})
+
+    def fail_send(email, otp):
+        raise backend.requests.exceptions.ConnectionError('simulated email service outage')
+
+    monkeypatch.setattr(backend, 'send_password_reset_email', fail_send)
+    caplog.set_level(logging.ERROR, logger='app')
+
+    response = app.test_client().post('/api/forgot-password', json={'email': email})
+
+    assert response.status_code == 503
+    assert response.is_json
+    assert response.get_json() == {
+        'error': 'Unable to send a verification email right now. Check the email settings and try again.'
+    }
+    assert any(
+        record.getMessage() == 'Could not send ShopEase OTP email' and record.exc_info
+        for record in caplog.records
+    )
 
 
 def test_account_data_requires_authenticated_matching_user():

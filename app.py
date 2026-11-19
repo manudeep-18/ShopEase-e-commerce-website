@@ -383,8 +383,14 @@ def request_otp(email: str, purpose: str, sender: Any) -> tuple[bool, str | None
     otp = generate_otp()
     try:
         sender(email, otp)
-    except (OSError, smtplib.SMTPException, RuntimeError, ValueError) as exc:
-        logger.warning('Could not send ShopEase OTP email: %s', exc)
+    except (
+        OSError,
+        smtplib.SMTPException,
+        RuntimeError,
+        ValueError,
+        requests.exceptions.RequestException,
+    ):
+        logger.exception('Could not send ShopEase OTP email')
         return False, 'Unable to send a verification email right now. Check the email settings and try again.'
     store_otp(email, purpose, otp, now)
     record_otp_request(email, now)
@@ -1465,27 +1471,33 @@ def login():
 
 @app.post('/api/forgot-password')
 def forgot_password():
-    payload = request.get_json(silent=True) or {}
-    email = str(payload.get('email') or '').strip().lower()
-    if not email or '@' not in email:
-        return jsonify({'error': 'Enter a valid email address'}), 400
+    try:
+        payload = request.get_json(silent=True) or {}
+        if not isinstance(payload, dict):
+            return jsonify({'error': 'Enter a valid email address'}), 400
+        email = str(payload.get('email') or '').strip().lower()
+        if not email or '@' not in email:
+            return jsonify({'error': 'Enter a valid email address'}), 400
 
-    if not smtp_is_configured():
-        return jsonify({'error': 'Password reset email is not configured on this server.'}), 503
+        if not smtp_is_configured():
+            return jsonify({'error': 'Password reset email is not configured on this server.'}), 503
 
-    now = datetime.now(timezone.utc).timestamp()
-    limit_error = otp_request_limit_error(email, now)
-    if limit_error:
-        return jsonify({'error': limit_error}), 429
-    user = database.users.find_one({'email': email}, {'email': 1})
-    if user:
-        sent, error = request_otp(email, 'reset', send_password_reset_email)
-        if not sent:
-            status = 429 if error and error.startswith(('Too many', 'Please wait')) else 503
-            return jsonify({'error': error}), status
-    else:
-        record_otp_request(email, now)
-    return jsonify({'message': 'If this email is valid, an OTP has been sent'}), 200
+        now = datetime.now(timezone.utc).timestamp()
+        limit_error = otp_request_limit_error(email, now)
+        if limit_error:
+            return jsonify({'error': limit_error}), 429
+        user = database.users.find_one({'email': email}, {'email': 1})
+        if user:
+            sent, error = request_otp(email, 'reset', send_password_reset_email)
+            if not sent:
+                status = 429 if error and error.startswith(('Too many', 'Please wait')) else 503
+                return jsonify({'error': error}), status
+        else:
+            record_otp_request(email, now)
+        return jsonify({'message': 'If this email is valid, an OTP has been sent'}), 200
+    except Exception:
+        logger.exception('Unhandled error while processing password reset request')
+        return jsonify({'error': 'Unable to process password reset request right now.'}), 500
 
 
 @app.post('/api/reset-password')
